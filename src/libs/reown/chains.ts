@@ -1,6 +1,5 @@
 import {Chain} from "viem/chains";
 import {defineChain} from "viem";
-import * as process from "node:process";
 
 export const greenfieldTestnet: Chain = /*#__PURE__*/
     defineChain({
@@ -42,7 +41,7 @@ export const bscTestnet = /*#__PURE__*/ defineChain({
         symbol: 'tBNB',
     },
     rpcUrls: {
-        default: { http: [process.env.REACT_APP_ETH_NODE!!] },
+        default: { http: [import.meta.env.VITE_ETH_NODE!!] },
     },
     blockExplorers: {
         default: {

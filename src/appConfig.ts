@@ -127,21 +127,21 @@ export const appConfig = {
 }
 
 function etherscanKey() {
-    return process.env.REACT_APP_ETHERSCAN_KEY!!
+    return import.meta.env.VITE_ETHERSCAN_KEY!!
 }
 
 function projectId() {
-    return process.env.REACT_APP_WAGMI_PROJECT_ID!!
+    return import.meta.env.VITE_WAGMI_PROJECT_ID!!
 }
 
 function chainProfile(): ChainEnv {
-    return process.env.REACT_APP_CHAIN_NAME as ChainEnv || "bsctest"
+    return import.meta.env.VITE_CHAIN_NAME as ChainEnv || "bsctest"
 }
 
 function apiClientUrl() {
-    return process.env.REACT_APP_CLIENT_API_URL || "http://localhost:8081";
+    return import.meta.env.VITE_CLIENT_API_URL || "http://localhost:8081";
 }
 
 function gfAuthTtl() {
-    return Number(process.env.REACT_APP_GREENFEILD_AUTH_TL) || 7 * 24 * 60 * 60 * 1000;
+    return Number(import.meta.env.VITE_GREENFEILD_AUTH_TL) || 7 * 24 * 60 * 60 * 1000;
 }
