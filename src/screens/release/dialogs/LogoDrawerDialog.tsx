@@ -9,7 +9,7 @@ import {AppRoute} from "@router";
 interface LogoDrawerProps {
     open: boolean;
     onClose: () => void;
-    onSuccess?: () => void;
+    onSuccess: () => void;
 }
 
 export function LogoDrawerDialog(

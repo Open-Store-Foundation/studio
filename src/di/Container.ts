@@ -9,6 +9,7 @@ import {PublishingRepo} from "@data/client/PublishingRepo.ts";
 import {ApkValidator, PngLogoValidator} from "@utils/validators.ts";
 import {GreenfieldHttpClient} from "@data/greenfield/GreenfieldHttpClient.ts";
 import { EtherscanClient } from "@data/etherscan/EtherscanClient";
+import {appConfig} from "@config";
 
 class DI {
 
@@ -20,7 +21,7 @@ class DI {
     Cache: TimedCache = TimedCache.create()
     Gecko: CoinGeckoClient = new CoinGeckoClient(this.Cache)
 
-    Etherscan = new EtherscanClient(process.env.REACT_APP_ETHERSCAN_KEY, 97);
+    Etherscan = new EtherscanClient(appConfig.etherscanKey, 97);
     GasProvider: GasProvider = new GasProvider(this.Wallet, this.Cache)
     GreenfieldHttpClient: GreenfieldHttpClient = new GreenfieldHttpClient("https://gnfd-testnet-fullnode-tendermint-us.bnbchain.org:443")
     Greenfield: GreenfieldClient = new GreenfieldClient(GreenNetwork.Testnet, this.GreenfieldHttpClient, this.GasProvider, this.Cache)

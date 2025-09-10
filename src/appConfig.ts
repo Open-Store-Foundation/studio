@@ -6,6 +6,7 @@ import { Features } from "@reown/appkit";
 
 const contracts = {
     lh: {
+        // TODO actualize
         devFactory: "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9" as Address,
         oracle: "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9" as Address,
         store: "0x0165878A594ca255338adfa4d48449f69242Eb8F" as Address,
@@ -15,6 +16,7 @@ const contracts = {
         devGfPlugin: "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e" as Address,
         appOwnerPlugin: "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853" as Address,
         appDistributionPlugin: "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318" as Address,
+        appBuildPlugin: "0x0F09669588952cA48368dd8361662D549CcCE987" as Address,
 
         crossChain: "0xa5B2c9194131A4E0BFaCbF9E5D6722c873159cb7" as Address,
     },
@@ -87,7 +89,7 @@ export const appConfig = {
     confirmations: confirmations[chainEnv]!!,
 
     appKit: {
-        projectId: process.env.REACT_APP_WAGMI_PROJECT_ID,
+        projectId: projectId(),
         metadata: {
             name: 'Open Store Studio',
             description: 'Create and Publish decentralized apps',
@@ -109,6 +111,7 @@ export const appConfig = {
     },
 
     greenfieldAuthTtl: gfAuthTtl(),
+    etherscanKey: etherscanKey(),
     provider: () => window.ethereum!,
 
     defaultAppProtocolId: ProtocolId.Greenfield,
@@ -123,6 +126,14 @@ export const appConfig = {
     buildQuoteMultiplayer: 10,
 }
 
+function etherscanKey() {
+    return process.env.REACT_APP_ETHERSCAN_KEY!!
+}
+
+function projectId() {
+    return process.env.REACT_APP_WAGMI_PROJECT_ID!!
+}
+
 function chainProfile(): ChainEnv {
     return process.env.REACT_APP_CHAIN_NAME as ChainEnv || "bsctest"
 }
@@ -132,5 +143,5 @@ function apiClientUrl() {
 }
 
 function gfAuthTtl() {
-    return process.env.REACT_APP_GREENFEILD_AUTH_TL || 7 * 24 * 60 * 60 * 1000;
+    return Number(process.env.REACT_APP_GREENFEILD_AUTH_TL) || 7 * 24 * 60 * 60 * 1000;
 }

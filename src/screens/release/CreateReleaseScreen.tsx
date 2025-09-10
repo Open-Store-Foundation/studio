@@ -40,6 +40,7 @@ interface BuildStatus {
 }
 
 interface CreateReleaseData {
+    devName: string
     owner?: Address
     appBuild?: ScAppBuild
 
@@ -174,6 +175,7 @@ function SummaryStep(
             contentOffset={1}>
             <Stack spacing={2}>
                 <ConfirmAccountForm
+                    devName={data.devName}
                     owner={data?.owner}
                 />
 
@@ -491,6 +493,7 @@ export function CreateReleaseScreen() {
                                 <SummaryStep
                                     data={{
                                         owner: address,
+                                        devName: devId,
                                         appBuild: appBuild,
                                         isNotOwnershipVerified: isNotOwnershipVerified,
                                         onVerifyOwnership: () => navigate(ownerLink, { replace: true }),
