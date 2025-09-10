@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package greenfield.resource;
+
+enum ResourceType {
+  RESOURCE_TYPE_UNSPECIFIED = 0;
+  RESOURCE_TYPE_BUCKET = 1;
+  RESOURCE_TYPE_OBJECT = 2;
+  RESOURCE_TYPE_GROUP = 3;
+}

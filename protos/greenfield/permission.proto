@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package greenfield.permission;
+
+import "google/protobuf/timestamp.proto";
+import "greenfield/resource.proto";
+import "greenfield/common.proto";
+
+enum ActionType {
+  ACTION_UNSPECIFIED = 0;
+  ACTION_UPDATE_BUCKET_INFO = 1;
+  ACTION_DELETE_BUCKET = 2;
+  ACTION_CREATE_OBJECT = 3;
+  ACTION_DELETE_OBJECT = 4;
+  ACTION_COPY_OBJECT = 5;
+  ACTION_GET_OBJECT = 6;
+  ACTION_EXECUTE_OBJECT = 7;
+  ACTION_LIST_OBJECT = 8;
+  ACTION_UPDATE_GROUP_MEMBER = 9;
+  ACTION_DELETE_GROUP = 10;
+  ACTION_UPDATE_OBJECT_INFO = 11;
+  ACTION_UPDATE_GROUP_EXTRA = 12;
+  ACTION_UPDATE_GROUP_INFO = 13;
+  ACTION_UPDATE_OBJECT_CONTENT = 14;
+  ACTION_TYPE_ALL = 99;
+}
+
+enum PrincipalType {
+  PRINCIPAL_TYPE_UNSPECIFIED = 0;
+  PRINCIPAL_TYPE_GNFD_ACCOUNT = 1;
+  PRINCIPAL_TYPE_GNFD_GROUP = 2;
+}
+
+enum Effect {
+  EFFECT_UNSPECIFIED = 0;
+  EFFECT_ALLOW = 1;
+  EFFECT_DENY = 2;
+}
+
+message Principal {
+  PrincipalType type = 1;
+  string value = 2;
+}
+
+message Statement {
+  Effect effect = 1;
+  repeated ActionType actions = 2;
+  repeated string resources = 3;
+  google.protobuf.Timestamp expiration_time = 4;
+  greenfield.common.UInt64Value limit_size = 5;
+}
+
+message Policy {
+  string id = 1;
+  Principal principal = 2;
+  greenfield.resource.ResourceType resource_type = 3;
+  string resource_id = 4;
+  repeated Statement statements = 5;
+  google.protobuf.Timestamp expiration_time = 6;
+}

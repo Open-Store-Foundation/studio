@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package greenfield.storage;
+
+import "greenfield/common.proto";
+
+enum VisibilityType {
+  VISIBILITY_TYPE_UNSPECIFIED = 0;
+  VISIBILITY_TYPE_PUBLIC_READ = 1;
+  VISIBILITY_TYPE_PRIVATE = 2;
+  VISIBILITY_TYPE_INHERIT = 3;
+}
+
+message MsgUpdateBucketInfo {
+  string operator = 1;
+  string bucket_name = 2;
+  greenfield.common.UInt64Value charged_read_quota = 3;
+  string payment_address = 4;
+  VisibilityType visibility = 5;
+}

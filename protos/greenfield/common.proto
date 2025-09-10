@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package greenfield.common;
+
+message UInt64Value {
+  uint64 value = 1;
+}
