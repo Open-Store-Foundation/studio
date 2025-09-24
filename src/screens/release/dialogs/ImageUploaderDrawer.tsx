@@ -8,6 +8,7 @@ import {useObserveGreenfield} from "@hooks/useObserveGreenfield.ts";
 
 interface ImageUploaderProps {
     devId: string,
+    devAddress: Address,
     appPackage: string,
     address: Address,
 
@@ -35,6 +36,7 @@ export function ImageUploaderDrawer(props: ImageUploaderProps) {
     return <BaseFileUploaderDrawer
         address={props.address}
         devId={props.devId}
+        devAddress={props.devAddress}
         appPackage={props.appPackage}
 
         title={props.title}
@@ -56,6 +58,7 @@ function useObserveBuild(devId: string, appPackage: string, onSuccess: () => voi
             const hasImage = await greenfield.hasFile(devId, greenfield.logoPath(appPackage))
 
             if (hasImage) {
+                console.log("Image is uploaded!")
                 onSuccess()
                 return true
             }

@@ -13,6 +13,8 @@ import {AvoirSectionTitledBox} from "@components/basic/AvoirSection";
 import Stack from "@mui/material/Stack";
 import {RStr} from "@localization/ids.ts";
 import {str} from "@localization/res.ts";
+import {IconButton} from "@mui/material";
+import {IconRefresh} from "@tabler/icons-react";
 
 enum AppListError {
     Unknown,
@@ -24,6 +26,10 @@ export function DevAppsListScreen() {
     const navigate = useNavigate()
 
     const {setState, isLoading, data, error, retryCount, retry} = useScreenState<GridValidRowModel[], AppListError>()
+    const retryWithoutCache = () => {
+        ScAssetService.cleanAppsCache(devAddress)
+        retry()
+    }
 
     useAsyncEffect(
         async () => {
@@ -79,7 +85,17 @@ export function DevAppsListScreen() {
                 >
                     <AvoirSectionTitledBox
                         title={str(RStr.DevAppsListScreen_applications_title)}
-                        description={str(RStr.DevAppsListScreen_applications_description)}>
+                        description={str(RStr.DevAppsListScreen_applications_description)}
+                        action={() => {
+                            return <IconButton
+                                color={"primary"}
+                                onClick={retryWithoutCache}
+                                disabled={isFetching || isLoading}
+                            >
+                                <IconRefresh/>
+                            </IconButton>
+                        }}
+                    >
 
                         <AvoirTableView
                             rows={data}
@@ -91,7 +107,7 @@ export function DevAppsListScreen() {
                                     title={str(RStr.DevAppsListScreen_error_title)}
                                     description={str(RStr.DevAppsListScreen_error_description)}
                                     action={str(RStr.DevAppsListScreen_error_action)}
-                                    onAction={retry}
+                                    onAction={retryWithoutCache}
                                 />
                             }}
                             onClick={(data) => {

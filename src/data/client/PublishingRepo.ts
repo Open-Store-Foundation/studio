@@ -13,6 +13,7 @@ export enum ApkValidationStatus {
     InvalidApkFormat = 10,
     InvalidSignBlockFormat = 11,
     Zip64NotSupported = 12,
+    HashMismatch = 13,
 
     TooManySigners = 20,
     NoSignersFound = 21,
@@ -35,10 +36,7 @@ export enum ApkValidationStatus {
     DigestAlgorithmNotFound = 63,
 
     ProofNotFound = 70,
-    IncorrectEncryptionData1 = 71,
-    VersionIsOutdated = 72,
-    AssetlinkIsNotVerified = 73,
-    PublicKeyFormat = 74,
+    IncorrectCertFormat = 71,
     InvalidProof = 75,
 }
 
@@ -96,7 +94,7 @@ export class PublishingRepo {
     async getPublishing(appAddress: Address): Promise<AndroidPublishingResponse> {
         const data = await sendApiRequest(
             {
-                url: `/v1/object/status/${appAddress}`,
+                url: `/v1/asset/status/${appAddress}`,
                 method: "GET",
             },
             (response: AxiosResponse<HttpResponse<AndroidPublishingResponse>>) => {

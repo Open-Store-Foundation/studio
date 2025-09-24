@@ -45,7 +45,7 @@ export class S {
     }
 }
 
-export function useScreenState<T, E>(
+export function useScreenState<T, E = void>(
     params?: {
         initLoadings?: boolean,
         initData?: T,

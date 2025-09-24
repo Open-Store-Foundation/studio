@@ -32,6 +32,7 @@ import {str} from "@localization/res.ts";
 
 interface SummaryStepProps {
     devId: string;
+    devAddress: Address;
     appPackage: string;
     appAddress: Address;
     newData: ScAppGeneralInfo;
@@ -41,6 +42,7 @@ interface SummaryStepProps {
 
 function SummaryStep({
     devId,
+    devAddress,
     appPackage,
     appAddress,
     newData,
@@ -86,6 +88,7 @@ function SummaryStep({
 
                     <AmountsSummaryForm
                         devId={devId}
+                        devAddress={devAddress}
                         onState={onStateChange}
                         onError={onError}
                         estimation={estimateCall}
@@ -110,7 +113,7 @@ function SummaryStep({
 export function AppEditGeneralInfoScreen() {
     const navigate = useNavigate();
 
-    const {devId, appPackage, appAddress, isFetching} = AppRoute.AppInfoEdit.useParams();
+    const {devId, devAddress, appPackage, appAddress, isFetching} = AppRoute.AppInfoEdit.useParams();
 
     const [activeStep, setActiveStep] = useState(0);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -286,6 +289,7 @@ export function AppEditGeneralInfoScreen() {
                                     <>
                                         <SummaryStep
                                             devId={devId}
+                                            devAddress={devAddress}
                                             appPackage={appPackage}
                                             appAddress={appAddress}
                                             newData={newData}

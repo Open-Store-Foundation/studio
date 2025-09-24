@@ -22,6 +22,7 @@ import {Reg} from "@utils/regex.ts";
 
 interface SummaryStepProps {
     devId: string;
+    devAddress: Address;
     appPackage: string;
     appAddress: Address;
     distribution: ScAppDistribution;
@@ -31,6 +32,7 @@ interface SummaryStepProps {
 
 function SummaryStep({
     devId,
+    devAddress,
     appPackage,
     appAddress,
     distribution,
@@ -61,6 +63,7 @@ function SummaryStep({
 
                     <AmountsSummaryForm
                         devId={devId}
+                        devAddress={devAddress}
                         onState={onStateChange}
                         onError={onError}
                         estimation={estimateCall}
@@ -85,7 +88,7 @@ function SummaryStep({
 export function AppEditDistributionScreen() {
     const navigate = useNavigate();
 
-    const {devId, appPackage, appAddress, isFetching} = AppRoute.AppDistributionEdit.useParams();
+    const {devId, devAddress, appPackage, appAddress, isFetching} = AppRoute.AppDistributionEdit.useParams();
 
     const [activeStep, setActiveStep] = useState(0);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -328,6 +331,7 @@ export function AppEditDistributionScreen() {
                                     activeStep === 1 && newDistributionData &&
                                     <SummaryStep
                                         devId={devId}
+                                        devAddress={devAddress}
                                         appPackage={appPackage}
                                         appAddress={appAddress}
                                         distribution={newDistributionData}

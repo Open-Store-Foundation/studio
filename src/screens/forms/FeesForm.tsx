@@ -209,14 +209,15 @@ export function FeesForm(
                     </AvoirPropertyBox>
 
                     {
-                        currentNetflowRatePerMonth && nextNetflowRatePerMonth &&
-                        <Stack alignItems={"end"}>
-                            <Typography variant="caption" color="text.secondary" sx={{mt: 1}}>
-                                {str(RStr.FeesForm_storagePriceRate)
-                                    .replace("{from}", `${formatBigIntWithUsd(currentNetflowRatePerMonth, usdRate)}`)
-                                    .replace("{to}", `${formatBigIntWithUsd(nextNetflowRatePerMonth, usdRate)}`)}
-                            </Typography>
-                        </Stack>
+                        currentNetflowRatePerMonth != null && nextNetflowRatePerMonth != null && (
+                            <Stack alignItems={"end"}>
+                                <Typography variant="caption" color="text.secondary" sx={{mt: 1, mx: 2}}>
+                                    {str(RStr.FeesForm_storagePriceRate)
+                                        .replace("{from}", `${formatBigIntWithUsd(currentNetflowRatePerMonth, usdRate)}`)
+                                        .replace("{to}", `${formatBigIntWithUsd(nextNetflowRatePerMonth, usdRate)}`)}
+                                </Typography>
+                            </Stack>
+                        )
                     }
                 </Stack>
             }

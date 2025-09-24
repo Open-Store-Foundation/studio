@@ -15,6 +15,7 @@ import {useObserveGreenfield} from "@hooks/useObserveGreenfield.ts";
 
 interface ApkUploaderProps {
     devId: string,
+    devAddress: Address,
     appPackage: string,
     address: Address,
     appAddress: Address,
@@ -33,7 +34,7 @@ export function ApkUploaderDrawer(props: ApkUploaderProps) {
 
     const { isLastBuildLoading, lastBuildVersion } = useLastBuildVersion(props.appAddress, setError);
     const { isApkInfoLoading, apkInfo } = useApkInfo(file, lastBuildVersion, props.appPackage, setError);
-    const { isObservingBuild, startObserver } = useObserveBuild(apkInfo, props.appPackage, props.onSuccess);
+    const { isObservingBuild, startObserver } = useObserveBuild(props.devId, props.onSuccess);
 
     const handleNext = async () => {
         if (apkInfo && file) {
@@ -44,8 +45,8 @@ export function ApkUploaderDrawer(props: ApkUploaderProps) {
     }
 
     const handleSuccess = async () => {
-        if (apkInfo) {
-            startObserver()
+        if (apkInfo != null) {
+            startObserver(apkInfo)
         }
     };
 
@@ -58,6 +59,7 @@ export function ApkUploaderDrawer(props: ApkUploaderProps) {
         <BaseFileUploaderDrawer
             address={props.address}
             devId={props.devId}
+            devAddress={props.devAddress}
             appPackage={props.appPackage}
 
             title={props.title}
@@ -132,25 +134,27 @@ function useApkInfo(file: File | null, lastBuildVersion: number | null, appPacka
     return { isApkInfoLoading: isLoading, apkInfo: data }
 }
 
-function useObserveBuild(apkInfo: ApkInfo | null, appPackage: string, onSuccess: (build: ScAppBuild) => void) {
+function useObserveBuild(devId: string, onSuccess: (build: ScAppBuild) => void) {
     const greenfield = useGreenfield();
 
-    const { isObservingBuild, startObserver } = useObserveGreenfield(
-        async () => {
+    const { isObservingBuild, startObserver } = useObserveGreenfield<ApkInfo>(
+        async (apkInfo) => {
             if (apkInfo == null) {
-                return false;
+                console.log("Apk info is not found!")
+                return true;
             }
 
-            const buildFile = await greenfield.getAppVersion(appPackage, apkInfo);
+            const buildFile = await greenfield.getAppVersion(devId, apkInfo);
 
             if (buildFile != null) {
+                console.log("Apk is uploaded!")
                 onSuccess(toAppBuild(buildFile));
                 return true;
             }
 
             return false;
         },
-        [apkInfo],
+        [],
     )
 
     return { isObservingBuild, startObserver }

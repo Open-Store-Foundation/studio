@@ -21,11 +21,11 @@ import {VisibilityType} from "./generated/greenfield/storage.ts";
 import {GreenfieldHttpClient} from "@data/greenfield/GreenfieldHttpClient.ts";
 import { toHex } from "viem";
 
-
 export interface DelegateCreateParams {
     path: string,
     file: File,
     bucket: string,
+    isUpdate: boolean
     onProgress: (progress: number) => void,
 }
 
@@ -69,6 +69,10 @@ export class GreenfieldClient {
         const quote = formatQuota(await this.bucketReadQuote(auth, bucket))
         const isEnoughQuote = quoteRequirement <= quote.remain
         return isEnoughQuote
+    }
+
+    clearQuoteCache(bucket: string) {
+        this.cache.delete(CacheKeys.GfQuote.key(bucket))
     }
 
     async bucketReadQuote(auth: GfAuth, bucket: string): Promise<IQuotaProps> {
@@ -158,21 +162,23 @@ export class GreenfieldClient {
     }
 
     async createBucketPolicyData(bucket: string, owner: Address) {
-        const bucketInfo = await this.httpClient.bucket.headBucket(bucket.toLowerCase())
+        const lcBucket = bucket.toLowerCase()
+        const bucketInfo = await this.httpClient.bucket.headBucket(lcBucket)
 
         if (!bucketInfo.bucketInfo) {
             return undefined
         }
 
+        // some SP don't delete objects without explicit ActionType.ACTION_DELETE_OBJECT and `${lcBucket}/*`
         const policyData = Policy.encode({
             id: '0',
-            resourceId: bucketInfo.bucketInfo.id, // bucket id
+            resourceId: bucketInfo.bucketInfo.id,
             resourceType: ResourceType.RESOURCE_TYPE_BUCKET,
             statements: [
                 {
                     effect: Effect.EFFECT_ALLOW,
-                    actions: [ActionType.ACTION_TYPE_ALL], // allow upload file to the bucket
-                    resources: [],
+                    actions: [ActionType.ACTION_TYPE_ALL, ActionType.ACTION_DELETE_OBJECT],
+                    resources: [`${lcBucket}/*`],
                     expirationTime: undefined,
                     limitSize: undefined
                 },
@@ -185,6 +191,19 @@ export class GreenfieldClient {
         }).finish();
 
         return toHex(policyData)
+    }
+
+    cachedAuth(chainId: number, address: string): GfAuth | null {
+        const seed = AuthStorage.getAuth(chainId, address)
+
+        if (seed == null) {
+            return null
+        }
+
+        return {
+            seeds: seed,
+            address: address
+        }
     }
 
     async auth(chainId: number, address: string, provider: unknown): Promise<GfAuth | null> {
@@ -247,7 +266,7 @@ export class GreenfieldClient {
                 body: request.file,
                 delegatedOpts: {
                     visibility: VisibilityType.VISIBILITY_TYPE_PUBLIC_READ,
-                    isUpdate: false
+                    isUpdate: request.isUpdate
                 },
                 onProgress: (progress: any) => request?.onProgress(progress.percent)
             },
@@ -309,7 +328,7 @@ export class GreenfieldClient {
             const data = await this.client.object.headObject(bucket.toLowerCase(), path)
             return data.objectInfo != null
         } catch (e) {
-            console.error("Error getting file info: ", e)
+            console.log(`Can't find file info ${path}`)
             return false
         }
     }
@@ -344,9 +363,10 @@ export class GreenfieldClient {
     }
 
     async getAppVersions(bucket: string, appPackage: string, version?: string, code?: number, checksum?: String): Promise<GfBuildFile[]> {
-        const primaryPrefix = `${this.getAppFolder(appPackage)}/v/`
-        let prefix = primaryPrefix
+        const basePath = `${this.getAppFolder(appPackage)}/v`
+        const primaryPrefix = `${basePath}/`
 
+        let prefix = basePath
         if (version) {
             prefix += `/${version}`
 
@@ -366,7 +386,7 @@ export class GreenfieldClient {
 
         const objects = await this.client.object.listObjects(
             {
-                bucketName: bucket,
+                bucketName: bucket.toLowerCase(),
                 endpoint: sp,
                 query: new URLSearchParams([
                     [`prefix`, prefix],

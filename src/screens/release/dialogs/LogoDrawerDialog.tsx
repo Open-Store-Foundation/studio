@@ -19,7 +19,7 @@ export function LogoDrawerDialog(
         onSuccess,
     }: LogoDrawerProps
 ) {
-    const {devId, appPackage, address} = AppRoute.AppAsset.useParams();
+    const {devId, devAddress, appPackage, address} = AppRoute.AppAsset.useParams();
 
     return (
         <Drawer
@@ -39,6 +39,7 @@ export function LogoDrawerDialog(
                 <ScrollableContentContainer>
                     <ImageUploaderDrawer
                         devId={devId}
+                        devAddress={devAddress}
                         appPackage={appPackage}
                         address={address}
                         onClose={onClose}

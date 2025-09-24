@@ -42,7 +42,6 @@ export function AltIntroDevsScreen() {
         if (address) {
             try {
                 const data = await ScDevService.getDevAccounts(address)
-                // const data = Array.from({length: 10}).map((_, i) => { return { id: `dev-${i}`, address: `0x${i.toString(16)}` } })
                 setState(S.data(data))
             } catch (e) {
                 setState(S.data([]))
@@ -58,13 +57,19 @@ export function AltIntroDevsScreen() {
         <>
             <Toolbar/>
 
-            <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'flex-start', minHeight: 'calc(100vh - 80px)', py: 10}}>
+            <Box sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'flex-start',
+                minHeight: 'calc(100vh - 80px)',
+                py: 10
+            }}>
                 <AutoSnackbar
                     message={errorMsg}
                     onClose={() => setErrorMsg(null)}
                 />
 
-                <Box sx={{width: { xs: '100%', sm: 560 }, maxWidth: '100%', px: { xs: 2, sm: 0 }}}>
+                <Box sx={{width: {xs: '100%', sm: 500}, maxWidth: '100%', px: {xs: 2, sm: 0}}}>
                     <Box sx={{display: 'flex', justifyContent: 'center'}}>
                         <Header
                             isConnected={isConnected}
@@ -73,82 +78,100 @@ export function AltIntroDevsScreen() {
                         />
                     </Box>
 
-                    {isConnected && isLoading && (
-                        <Box sx={{display: 'flex', justifyContent: 'center', my: 4}}>
-                            <CircularProgress/>
-                        </Box>
-                    )}
-
                     {!isConnected && (
                         <Stack spacing={3} sx={{mt: 1}}>
                             <AvoirCardItem
                                 onClick={handleOpenWalletModal}
                                 left={
-                                    <Avatar sx={{ bgcolor: 'primary.main', color: 'primary.contrastText', width: 40, height: 40 }}>
+                                    <Avatar sx={{
+                                        bgcolor: 'primary.main',
+                                        color: 'primary.contrastText',
+                                        width: 40,
+                                        height: 40
+                                    }}>
                                         <AccountBalanceWalletRounded fontSize="small"/>
                                     </Avatar>
                                 }
                                 title={"Connect existing wallet"}
                             />
 
-                            <Typography variant="caption" align="center" color="textSecondary" sx={{ maxWidth: { xs: 320, sm: 420 }, mx: 'auto', alignSelf: 'center' }}>
+                            <Typography variant="caption" align="center" color="textSecondary"
+                                        sx={{maxWidth: {xs: 320, sm: 420}, mx: 'auto', alignSelf: 'center'}}>
                                 By connecting your wallet, you acknowledge that you have read and agree to our{' '}
-                                <Link href={AppRoute.Article.route(AppRoute.Article.Terms)} underline="hover">Terms of Service</Link>{' '}and{' '}
-                                <Link href={AppRoute.Article.route(AppRoute.Article.Privacy)} underline="hover">Privacy Policy</Link>.
+                                <Link href={AppRoute.Article.route(AppRoute.Article.Terms)} underline="hover">Terms of
+                                    Service</Link>{' '}and{' '}
+                                <Link href={AppRoute.Article.route(AppRoute.Article.Privacy)} underline="hover">Privacy
+                                    Policy</Link>.
                             </Typography>
                         </Stack>
                     )}
 
                     {isConnected && (
-                    <>
-                    <Box sx={{display: 'flex', justifyContent: 'center', mt: 2, mb: 0.5}}>
-                        <Typography
-                            variant="overline"
-                            fontWeight={700}
-                            color="text.secondary"
-                            sx={{letterSpacing: '.08em'}}
-                        >
-                            Publisher accounts
-                        </Typography>
-                    </Box>
-                    <Stack spacing={{ xs: 1.25, sm: 1.5 }} sx={{mt: 0.5}}>
-                        {accounts && accounts.length > 0 ? (
-                            accounts.map((item) => (
-                                <AvoirCardItem
-                                    key={item.id}
-                                    onClick={() => navigate(AppRoute.DevAccount.route(item.id, item.address))}
-                                    left={<DefaultAvatar name={item.id} size={40}/>} 
-                                    title={item.id}
-                                    right={<Chip label="Greenfield" size="small" color="primary" variant="filled" sx={{ fontWeight: 600, display: { xs: 'none', sm: 'inline-flex' } }}/>} 
-                                />
-                            ))
-                        ) : (
-                            <Box width={"100%"} py={2} display={"flex"} alignItems={"center"} justifyContent={"center"}>
-                                <Typography color={"textSecondary"} textAlign={"center"} variant="subtitle2">
-                                    {str(RStr.IntroDevsScreen_noAccounts)}
+                        <>
+                            <Box sx={{display: 'flex', justifyContent: 'center', mt: 3, mb: 1}}>
+                                <Typography
+                                    variant="overline"
+                                    fontWeight={700}
+                                    color="text.secondary"
+                                    sx={{letterSpacing: '.08em'}}
+                                >
+                                    Publisher accounts
                                 </Typography>
                             </Box>
-                        )}
 
-                        <AvoirCardItem
-                            onClick={() => isConnected && handleCreatePublisher()}
-                            disabled={!isConnected}
-                            left={
-                                <Avatar sx={{ bgcolor: 'primary.main', color: 'primary.contrastText', width: { xs: 36, sm: 40 }, height: { xs: 36, sm: 40 } }}>
-                                    <AddRounded fontSize="small"/>
-                                </Avatar>
+                            {isConnected && isLoading && (
+                                <Box sx={{display: 'flex', justifyContent: 'center', my: 4}}>
+                                    <CircularProgress/>
+                                </Box>
+                            )}
+
+                            {
+                                !isLoading && (
+                                    <Stack spacing={{xs: 1.25, sm: 1.5}}>
+                                        {
+                                            accounts && accounts.length > 0 && (
+                                                accounts.map((item) => (
+                                                    <AvoirCardItem
+                                                        key={item.id}
+                                                        onClick={() => navigate(AppRoute.DevAccount.route(item.id, item.address))}
+                                                        left={<DefaultAvatar name={item.id} size={40}/>}
+                                                        title={item.id}
+                                                        right={<Chip label="Greenfield" size="small" color="primary"
+                                                                     variant="filled" sx={{
+                                                            fontWeight: 600,
+                                                            display: {xs: 'none', sm: 'inline-flex'}
+                                                        }}/>}
+                                                    />
+                                                ))
+                                            )
+                                        }
+
+                                        <AvoirCardItem
+                                            onClick={() => isConnected && handleCreatePublisher()}
+                                            disabled={!isConnected}
+                                            left={
+                                                <Avatar sx={{
+                                                    bgcolor: 'primary.main',
+                                                    color: 'primary.contrastText',
+                                                    width: {xs: 36, sm: 40},
+                                                    height: {xs: 36, sm: 40}
+                                                }}>
+                                                    <AddRounded fontSize="small"/>
+                                                </Avatar>
+                                            }
+                                            title={str(RStr.IntroDevsScreen_createNew)}
+                                        />
+                                    </Stack>
+                                )
                             }
-                            title={str(RStr.IntroDevsScreen_createNew)}
-                        />
-                    </Stack>
-                    </>
+                        </>
                     )}
                 </Box>
             </Box>
 
-            <WalletPopup open={walletPopupOpen} onClose={() => setWalletPopupOpen(false)} />
+            <WalletPopup open={walletPopupOpen} onClose={() => setWalletPopupOpen(false)}/>
 
-            <AvoirFooter />
+            <AvoirFooter/>
         </>
     )
 }
@@ -229,8 +252,8 @@ function Toolbar() {
                  px: 2,
                  position: 'fixed',
                  zIndex: (theme) => theme.zIndex.appBar + 1,
-                 bgcolor: { sm: "background.default", md: "transparent" }
-            }}
+                 bgcolor: {sm: "background.default", md: "transparent"}
+             }}
         >
             <IconButton
                 color={"primary"}

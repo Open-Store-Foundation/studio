@@ -26,6 +26,7 @@ import {appConfig} from "@config";
 import {parseEther} from "viem";
 import {useAsyncEffect} from "@utils/state.ts";
 import {useObserveGreenfield} from "@hooks/useObserveGreenfield.ts";
+import {ScreenAwaitng} from "@components/basic/ScreenAwaitng.tsx";
 
 export function IntroCreateDevScreen() {
     const navigate = useNavigate()
@@ -39,10 +40,11 @@ export function IntroCreateDevScreen() {
                 backText={str(RStr.IntroCreateDevScreen_drawer_allDevelopers)}
                 backLink={AppRoute.Devs.route()}
                 onBack={() => {
-                    navigate(AppRoute.Devs.route(), { replace: true })
+                    navigate(AppRoute.Devs.route(), {replace: true})
                     setDrawerOpen(false)
                 }}
-                onClose={() => setDrawerOpen(false)}/>
+                onClose={() => setDrawerOpen(false)}
+            />
 
             <AvoirToolbar
                 onOpenMenu={() => {
@@ -57,7 +59,7 @@ export function IntroCreateDevScreen() {
                     title={str(RStr.IntroCreateDevScreen_title)}
                     description={str(RStr.IntroCreateDevScreen_description)}/>
 
-                <Box component="main" sx={{ flex: '1 0 auto' }}>
+                <Box component="main" sx={{flex: '1 0 auto'}}>
                     <Content/>
                 </Box>
 
@@ -92,6 +94,7 @@ function Content() {
 
     const {
         isCreating,
+        isObservingBuild,
         devAddress,
         spProvider,
         creationError,
@@ -127,112 +130,121 @@ function Content() {
                 justifyContent={"center"}
                 spacing={4}>
 
-                <Stack
-                    flexGrow={1}
-                    spacing={3}
-                    maxWidth={"1024px"}
-                    pb={10}>
+                {
+                    isObservingBuild &&
+                    <ScreenAwaitng title={"Getting your new publisher account ready"}/>
+                }
 
-                    <AvoirSectionTitledBox
-                        contentOffset={2}
-                        title={str(RStr.IntroCreateDevScreen_developerInfo_title)}
-                        description={str(RStr.IntroCreateDevScreen_developerInfo_description)}>
-                        <Stack spacing={3}>
-                            <Stack direction="column" spacing={2}>
-                                <CheckableTextField
-                                    label={str(RStr.IntroCreateDevScreen_name_label)}
-                                    value={name}
-                                    maxLength={appConfig.maxDevNameLength}
-                                    onChange={onNameChange}
-                                    onCommit={validateName}
-                                    error={nameError != null}
-                                    loading={isValidatingName}
-                                    disabled={isValidatingName || isLoading}
-                                    commitDisabled={checkNameDisabled}
-                                    helperText={nameError ?? str(RStr.IntroCreateDevScreen_name_helper)}/>
-                            </Stack>
+                {
+                    !isObservingBuild && (<>
+                        <Stack
+                            flexGrow={1}
+                            spacing={3}
+                            maxWidth={"1024px"}
+                            pb={10}>
+
+                            <AvoirSectionTitledBox
+                                contentOffset={2}
+                                title={str(RStr.IntroCreateDevScreen_developerInfo_title)}
+                                description={str(RStr.IntroCreateDevScreen_developerInfo_description)}>
+                                <Stack spacing={3}>
+                                    <Stack direction="column" spacing={2}>
+                                        <CheckableTextField
+                                            label={str(RStr.IntroCreateDevScreen_name_label)}
+                                            value={name}
+                                            maxLength={appConfig.maxDevNameLength}
+                                            onChange={onNameChange}
+                                            onCommit={validateName}
+                                            error={nameError != null}
+                                            loading={isValidatingName}
+                                            disabled={isValidatingName || isLoading}
+                                            commitDisabled={checkNameDisabled}
+                                            helperText={nameError ?? str(RStr.IntroCreateDevScreen_name_helper)}/>
+                                    </Stack>
+                                </Stack>
+                            </AvoirSectionTitledBox>
+
+                            <AvoirSectionTitledBox
+                                contentOffset={2}
+                                title={str(RStr.IntroCreateDevScreen_primaryStorage_title)}
+                                description={str(RStr.IntroCreateDevScreen_primaryStorage_description)}
+                                infoLink={AppRoute.Article.route(AppRoute.Article.HowItWorks)}>
+                                <AvoirCard
+                                    title={ProtocolIdUtil.getProtocolName(ProtocolId.Greenfield)}
+                                    description={str(RStr.IntroCreateDevScreen_greenfield_description)}
+                                    image="https://forklog.com/wp-content/uploads/bnb_bsc-min.webp"
+                                    selected={true}
+                                />
+                            </AvoirSectionTitledBox>
+
+
                         </Stack>
-                    </AvoirSectionTitledBox>
-
-                    <AvoirSectionTitledBox
-                        contentOffset={2}
-                        title={str(RStr.IntroCreateDevScreen_primaryStorage_title)}
-                        description={str(RStr.IntroCreateDevScreen_primaryStorage_description)}
-                        infoLink={AppRoute.Article.route(AppRoute.Article.HowItWorks)}>
-                        <AvoirCard
-                            title={ProtocolIdUtil.getProtocolName(ProtocolId.Greenfield)}
-                            description={str(RStr.IntroCreateDevScreen_greenfield_description)}
-                            image="https://forklog.com/wp-content/uploads/bnb_bsc-min.webp"
-                            selected={true}
-                        />
-                    </AvoirSectionTitledBox>
-
-
-                </Stack>
-
-                <Stack
-                    position={"sticky"}
-                    width={450}
-                    height={"100%"}
-                    flexShrink={0}
-                    spacing={2}>
-
-                    <AvoirSectionBox variant={"side"}>
-                        <AvoirSectionTitle
-                            title={str(RStr.IntroCreateDevScreen_reviewSummary_title)}
-                        />
 
                         <Stack
+                            position={"sticky"}
+                            width={450}
+                            height={"100%"}
+                            flexShrink={0}
                             spacing={2}>
 
-                            <Stack spacing={2}>
-                                <ConfirmAccountForm
-                                    devName={validatedName}
-                                    owner={address}
-                                    devAddress={devAddress}
-                                    spProvider={spProvider}
+                            <AvoirSectionBox variant={"side"}>
+                                <AvoirSectionTitle
+                                    title={str(RStr.IntroCreateDevScreen_reviewSummary_title)}
                                 />
 
-                                <AmountsSummaryForm
-                                    {...{
-                                        isReady: devAddress != null && spProvider != null,
-                                        estimation: estimateCall,
-                                        onError: setFeeError,
-                                        onState: setState,
+                                <Stack
+                                    spacing={2}>
 
-                                        topUpStorageAmount: appConfig.defaultBucketTopUp,
-                                        withBalance: true,
+                                    <Stack spacing={2}>
+                                        <ConfirmAccountForm
+                                            devName={validatedName}
+                                            owner={address}
+                                            devAddress={devAddress}
+                                            spProvider={spProvider}
+                                        />
 
-                                        withValidation: undefined,
-                                        withOracle: undefined,
-                                        relayCalls: undefined,
-                                        storageMessages: undefined,
-                                        onIncreaseQuota: undefined,
-                                        devId: undefined,
-                                        fileSize: undefined,
-                                        quoteMultiplayer: undefined,
-                                        retryKey: undefined,
-                                        newQuoteGb: undefined,
-                                    }}
-                                />
-                            </Stack>
+                                        <AmountsSummaryForm
+                                            {...{
+                                                isReady: devAddress != null && spProvider != null,
+                                                estimation: estimateCall,
+                                                onError: setFeeError,
+                                                onState: setState,
 
-                            <Stack
-                                display={"flex"}
-                                justifyContent={"flex-end"}>
+                                                topUpStorageAmount: appConfig.defaultBucketTopUp,
+                                                withBalance: true,
 
-                                <AvoirButtons
-                                    text={str(RStr.IntroCreateDevScreen_button_create)}
-                                    color={"primary"}
-                                    withIcon={false}
-                                    disabled={!canCreate || isLoading}
-                                    loading={isCreating}
-                                    onClick={createDevAccount}
-                                />
-                            </Stack>
+                                                withValidation: undefined,
+                                                withOracle: undefined,
+                                                relayCalls: undefined,
+                                                storageMessages: undefined,
+                                                onIncreaseQuota: undefined,
+                                                devId: undefined,
+                                                fileSize: undefined,
+                                                quoteMultiplayer: undefined,
+                                                retryKey: undefined,
+                                                newQuoteGb: undefined,
+                                            }}
+                                        />
+                                    </Stack>
+
+                                    <Stack
+                                        display={"flex"}
+                                        justifyContent={"flex-end"}>
+
+                                        <AvoirButtons
+                                            text={str(RStr.IntroCreateDevScreen_button_create)}
+                                            color={"primary"}
+                                            withIcon={false}
+                                            disabled={!canCreate || isLoading}
+                                            loading={isCreating}
+                                            onClick={createDevAccount}
+                                        />
+                                    </Stack>
+                                </Stack>
+                            </AvoirSectionBox>
                         </Stack>
-                    </AvoirSectionBox>
-                </Stack>
+                    </>)
+                }
             </Stack>
         </ContentContainer>
     )
@@ -307,8 +319,8 @@ function useValidateDevName() {
 }
 
 interface DevAccountEventData {
+    devId: string;
     account: Address;
-    name: Address;
 }
 
 function useCreateDev({validatedName, canCreate}: { validatedName: string | null, canCreate: boolean }) {
@@ -321,10 +333,9 @@ function useCreateDev({validatedName, canCreate}: { validatedName: string | null
     const [devAddress, setDevAccount] = useState<Address | undefined>(undefined);
     const [spAddress, setSpAddress] = useState<Address | undefined>(undefined);
 
-    const { isObservingBuild, startObserver } = useObserveBucket(
-        validatedName,
+    const {isObservingBuild, startObserver} = useObserveBucket(
         (data) => {
-            navigate(AppRoute.DevAccount.route(data.name, data.account), {replace: true});
+            navigate(AppRoute.DevAccount.route(data.devId, data.account), {replace: true});
         }
     )
 
@@ -380,7 +391,7 @@ function useCreateDev({validatedName, canCreate}: { validatedName: string | null
             if (log) {
                 const event = ScDevService.decodeDevAccountCreateEvent(log);
                 ScDevService.setDevAddress(event.name, event.account);
-                startObserver()
+                startObserver({devId: event.name, account: event.account})
             } else {
                 navigate(-1);
                 setCreationError(str(RStr.IntroCreateDevScreen_error_created));
@@ -394,6 +405,7 @@ function useCreateDev({validatedName, canCreate}: { validatedName: string | null
 
     return {
         isCreating: isCreating || isObservingBuild,
+        isObservingBuild: isObservingBuild,
         estimateCall,
         createDevAccount,
         creationError,
@@ -403,26 +415,28 @@ function useCreateDev({validatedName, canCreate}: { validatedName: string | null
     }
 }
 
-function useObserveBucket(devId: string | null, onSuccess: (data: DevAccountEventData) => void) {
+function useObserveBucket(onSuccess: (data: DevAccountEventData) => void) {
     const greenfield = useGreenfield();
 
-    const { isObservingBuild, startObserver } = useObserveGreenfield<DevAccountEventData>(
+    const {isObservingBuild, startObserver} = useObserveGreenfield<DevAccountEventData>(
         async (data) => {
-            if (devId == null || data == null) {
+            if (data == null) {
+                console.log("DevId or Data are empty skip observation iteration!");
                 return false
             }
 
-            const hasImage = await greenfield.hasBucket(devId)
+            const hasImage = await greenfield.hasBucket(data.devId)
 
             if (hasImage) {
+                console.log("Bucket was created, finish observation!");
                 onSuccess(data)
                 return true
             }
 
             return false
         },
-        [devId],
+        [],
     )
 
-    return { isObservingBuild, startObserver }
+    return {isObservingBuild, startObserver}
 }

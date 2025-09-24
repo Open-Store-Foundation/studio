@@ -8,7 +8,7 @@ import {AvoirProperty, AvoirPropertyBox} from "@components/basic/AvoirProperty.t
 import {AvoirSectionBox, AvoirSectionTitle, AvoirSectionTitledBox} from "@components/basic/AvoirSection.tsx";
 import {ContractsInfoForm} from "@screens/forms/ContractsInfoForm.tsx";
 import {useGecko, useGreenfield} from "@di";
-import {useAsyncEffect} from "@utils/state.ts";
+import {S, useAsyncEffect, useScreenState} from "@utils/state.ts";
 import {useSafeAccount} from "@hooks/useSafeAccount.ts";
 import {GreenfieldFeeClient} from "@data/greenfield/GreenfieldFeeClient.ts";
 import {isValueLoading} from "@components/anim/AvoirSkeleton.tsx";
@@ -60,7 +60,8 @@ export function DevAccountScreen() {
     const gecko = useGecko()
     const auth = useGreenfieldAuth(address)
 
-    const [data, setData] = useState<StorageAccountInfo>({})
+    // const [data, setData] = useState<StorageAccountInfo>({})
+    const { data, setState, retry, retryCount } = useScreenState<StorageAccountInfo>({ initData: {} })
     const [error, setError] = useState<string | null>(null)
     const [isManageDrawerOpen, setIsManageDrawerOpen] = useState(false);
 
@@ -69,16 +70,18 @@ export function DevAccountScreen() {
             return
         }
 
-        setData(
-            {
-                accountBalanceIsLoading: true,
-                totalSizeIsLoading: true,
-                rateFlowIsLoading: true,
-                prepaidFeeIsLoading: true,
-                quoteFeeIsLoading: true,
-                storeFeeIsLoading: true,
-                quoteAvailableIsLoading: true,
-            }
+        setState(
+            S.data(
+                {
+                    accountBalanceIsLoading: true,
+                    totalSizeIsLoading: true,
+                    rateFlowIsLoading: true,
+                    prepaidFeeIsLoading: true,
+                    quoteFeeIsLoading: true,
+                    storeFeeIsLoading: true,
+                    quoteAvailableIsLoading: true,
+                }
+            )
         )
 
         try {
@@ -95,47 +98,54 @@ export function DevAccountScreen() {
                 GreenfieldFeeClient.GB_STORE_SIZE, GreenfieldFeeClient.MONTHLY_STORE_TIME
             )
 
+            const rateFlow = BigInt(balance.changeRate) * BigInt(GreenfieldFeeClient.MONTHLY_STORE_TIME)
+
+            console.log(`quoteFee ${quoteFee} | storeFee ${storeFee} | rateFlow ${rateFlow}`)
+
             const quote = await greenClient.bucketReadQuote(auth, devId)
             const quoteData = formatQuota(quote);
 
-            setData(
-                {
-                    accountBalance: BigInt(balance.availableBalance),
-                    accountBalanceIsLoading: false,
 
-                    totalSize: totalSize,
-                    totalSizeIsLoading: false,
+            setState(
+                S.data(
+                    {
+                        accountBalance: BigInt(balance.availableBalance),
+                        accountBalanceIsLoading: false,
 
-                    rateFlow: BigInt(balance.changeRate) * BigInt(GreenfieldFeeClient.MONTHLY_STORE_TIME),
-                    rateFlowIsLoading: false,
+                        totalSize: totalSize,
+                        totalSizeIsLoading: false,
 
-                    prepaidFee: BigInt(balance.lockedFee),
-                    prepaidFeeIsLoading: false,
+                        rateFlow: rateFlow,
+                        rateFlowIsLoading: false,
 
-                    quoteFee: quoteFee,
-                    quoteFeeIsLoading: false,
+                        prepaidFee: BigInt(balance.lockedFee),
+                        prepaidFeeIsLoading: false,
 
-                    storeFee: storeFee,
-                    storeFeeIsLoading: false,
+                        quoteFee: quoteFee,
+                        quoteFeeIsLoading: false,
 
-                    remainPercent: quoteData.remainPercent,
-                    freePrecent: quoteData.freeRemainPercent,
-                    mainPrecent: quoteData.readRemainPercent,
+                        storeFee: storeFee,
+                        storeFeeIsLoading: false,
 
-                    freeMonthly: quoteData.monthlyFreeQuota > 0 ? quoteData.showMonthly : undefined,
-                    freeOneTime: (quoteData.oneTimeFree > 0 && quoteData.oneTimeFreeRemain > 0) ? quoteData.showOneTime : undefined,
+                        remainPercent: quoteData.remainPercent,
+                        freePrecent: quoteData.freeRemainPercent,
+                        mainPrecent: quoteData.readRemainPercent,
 
-                    quoteAvailable: quoteData.show,
-                    quoteAvailableIsLoading: false,
+                        freeMonthly: quoteData.monthlyFreeQuota > 0 ? quoteData.showMonthly : undefined,
+                        freeOneTime: (quoteData.oneTimeFree > 0 && quoteData.oneTimeFreeRemain > 0) ? quoteData.showOneTime : undefined,
 
-                    usdRate: rate
-                }
+                        quoteAvailable: quoteData.show,
+                        quoteAvailableIsLoading: false,
+
+                        usdRate: rate
+                    }
+                )
             )
         } catch (e) {
             console.error(e)
             setError(DefaultSnackbarError)
         }
-    }, [auth])
+    }, [auth, retryCount])
 
     return (
         <PageContainer>
@@ -248,6 +258,7 @@ export function DevAccountScreen() {
                     <DevManageDrawerDialog
                         open={isManageDrawerOpen}
                         onClose={() => setIsManageDrawerOpen(false)}
+                        onSuccess={retry}
                     />
                 }
             </ContentContainer>

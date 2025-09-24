@@ -16,6 +16,8 @@ import {NotEnoughAlert} from "@screens/release/NotEnoughAlert.tsx";
 import {str} from "@localization/res.ts";
 import {RStr} from "@localization/ids.ts";
 import {ScGfCrosschainService} from "@data/sc/ScGfCrosschainService.ts";
+import {Address} from "@data/CommonModels.ts";
+import {absSubtract} from "@utils/decimal";
 
 export enum AmountSummaryState {
     Pending,
@@ -47,6 +49,7 @@ export class AmountSummaryHelper {
 }
 
 export interface FeesModuleProps {
+    devAddress?: Address;
     devId?: string;
     retryKey?: any;
     isReady?: boolean;
@@ -93,6 +96,7 @@ export function AmountsSummaryForm(props: FeesModuleProps) {
     const {
         isReady = true,
         retryKey,
+        devAddress,
         devId,
 
         onState,
@@ -169,7 +173,7 @@ export function AmountsSummaryForm(props: FeesModuleProps) {
             return
         }
 
-        if (auth == null) { // TODO
+        if (auth == null) { // TODO make it optional for some requests
             return
         }
 
@@ -179,7 +183,7 @@ export function AmountsSummaryForm(props: FeesModuleProps) {
             return
         }
 
-        if (newQuoteGb != undefined && (!auth || !devId)) {
+        if (newQuoteGb != undefined && (!auth || !devId || !devAddress)) {
             onState?.(AmountSummaryState.Pending)
             return
         }
@@ -235,46 +239,51 @@ export function AmountsSummaryForm(props: FeesModuleProps) {
             }
 
             // Netflow Fee
-            const balance = await greenfield.accountBalance(address)
-            let currentNetflowPerMonth: bigint = BigInt(balance.changeRate) * BigInt(GreenfieldFeeClient.MONTHLY_STORE_TIME);
+            let currentNetflowPerMonth: bigint | undefined = undefined;
             let nextNetflowPerMonth: bigint | undefined = undefined;
-            if (newQuoteGb != undefined && auth && devId) {
-                const quoteData = formatQuota(await greenfield.bucketReadQuote(auth, devId))
-                const currentQuotaGb = toGb(quoteData.totalRead)
 
-                if (currentQuotaGb != newQuoteGb) {
-                    const newPrepaidFee = await greenfield.fee.getQuotaNetflowRate(
-                        toBytes(newQuoteGb), GreenfieldFeeClient.MONTHLY_STORE_TIME
-                    )
-                    const currentPrepaidFee = await greenfield.fee.getQuotaNetflowRate(
-                        toBytes(currentQuotaGb), GreenfieldFeeClient.MONTHLY_STORE_TIME
-                    )
-                    nextNetflowPerMonth = currentNetflowPerMonth + (newPrepaidFee - currentPrepaidFee)
+            if (devAddress != null) {
+                const balance = await greenfield.accountBalance(devAddress)
+                currentNetflowPerMonth = BigInt(balance.changeRate) * BigInt(GreenfieldFeeClient.MONTHLY_STORE_TIME);
 
-                    // Settlement Fee Adjust
-                    if (storageFee != undefined) {
-                        const newPrepaidFeeWeekly = await greenfield.fee.getQuotaNetflowRate(
-                            toBytes(newQuoteGb), GreenfieldFeeClient.WEEK_STORE_TIME
-                        );
-                        const currentPrepaidFeeWeekly = await greenfield.fee.getQuotaNetflowRate(
-                            toBytes(currentQuotaGb), GreenfieldFeeClient.WEEK_STORE_TIME
-                        );
-                        const diffPrepaid = newPrepaidFeeWeekly - currentPrepaidFeeWeekly;
-                        storageFee += diffPrepaid;
+                if (newQuoteGb != undefined && auth && devId) {
+                    const quoteData = formatQuota(await greenfield.bucketReadQuote(auth, devId))
+                    const currentQuotaGb = toGb(quoteData.totalRead)
+
+                    if (currentQuotaGb != newQuoteGb) {
+                        const newQuoteRate = await greenfield.fee.getQuotaNetflowRate(
+                            toBytes(newQuoteGb), GreenfieldFeeClient.MONTHLY_STORE_TIME
+                        )
+                        const currentQuoteRate = await greenfield.fee.getQuotaNetflowRate(
+                            toBytes(currentQuotaGb), GreenfieldFeeClient.MONTHLY_STORE_TIME
+                        )
+                        nextNetflowPerMonth = absSubtract(currentNetflowPerMonth, newQuoteRate - currentQuoteRate)
+
+                        // Settlement Fee Adjust
+                        if (storageFee != undefined) {
+                            const newPrepaidFeeWeekly = await greenfield.fee.getQuotaNetflowRate(
+                                toBytes(newQuoteGb), GreenfieldFeeClient.WEEK_STORE_TIME
+                            );
+                            const currentPrepaidFeeWeekly = await greenfield.fee.getQuotaNetflowRate(
+                                toBytes(currentQuotaGb), GreenfieldFeeClient.WEEK_STORE_TIME
+                            );
+                            const diffPrepaid = newPrepaidFeeWeekly - currentPrepaidFeeWeekly;
+                            storageFee += diffPrepaid;
+                        }
                     }
                 }
-            }
 
-            // File size
-            if (_objectSize > 0 && auth && devId) {
-                const additionalStoreFee = await greenfield.fee.getStoreNetflowRate(
-                    BigInt(_objectSize), GreenfieldFeeClient.MONTHLY_STORE_TIME
-                )
+                // File size
+                if (_objectSize > 0 && auth && devId) {
+                    const additionalStoreFee = await greenfield.fee.getStoreNetflowRate(
+                        BigInt(_objectSize), GreenfieldFeeClient.MONTHLY_STORE_TIME
+                    )
 
-                if (nextNetflowPerMonth) {
-                    nextNetflowPerMonth += additionalStoreFee
-                } else {
-                    nextNetflowPerMonth = currentNetflowPerMonth + additionalStoreFee
+                    if (nextNetflowPerMonth) {
+                        nextNetflowPerMonth += additionalStoreFee
+                    } else {
+                        nextNetflowPerMonth = currentNetflowPerMonth + additionalStoreFee
+                    }
                 }
             }
 
@@ -373,7 +382,7 @@ export function AmountsSummaryForm(props: FeesModuleProps) {
             onState?.(AmountSummaryState.Error)
             onError?.(DefaultSnackbarError)
         }
-    }, [isReady, retryKey, auth, devId])
+    }, [isReady, retryKey, auth, devId, fileSize, quoteRequirement, topUpStorageAmount, newQuoteGb, relayCalls, withValidation, withOracle])
 
     return (
         <Stack spacing={2}>

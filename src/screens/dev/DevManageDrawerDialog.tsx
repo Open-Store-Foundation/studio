@@ -25,6 +25,7 @@ import {ScDevService} from "@data/sc/ScDevService.ts";
 import {Hex, parseEther} from "viem";
 import {useObserveGreenfield} from "@hooks/useObserveGreenfield.ts";
 import {sleep} from "@utils/sleep.ts";
+import {Address} from "@data/CommonModels.ts";
 
 interface DevManageDrawerDialogProps {
     open: boolean;
@@ -131,6 +132,7 @@ function DataStep({
 
 interface FeesStepProps {
     devId: string;
+    devAddress: Address;
     selectedQuotaGb: number;
     topUpAmount: number;
     currentQuotaGb: number;
@@ -142,6 +144,7 @@ interface FeesStepProps {
 function FeesStep(
     {
         devId,
+        devAddress,
         selectedQuotaGb,
         topUpAmount,
         currentQuotaGb,
@@ -156,12 +159,13 @@ function FeesStep(
         <Stack width="100%" spacing={3}>
             <AmountsSummaryForm
                 devId={devId}
+                devAddress={devAddress}
                 onState={onStateChange}
                 onError={onError}
                 topUpStorageAmount={topUpAmount > 0 ? topUpAmount : undefined}
                 newQuoteGb={newQuoteGb}
                 estimation={estimate}
-                withBalance={false}
+                withBalance={true}
 
                 storageMessages={undefined}
                 onIncreaseQuota={undefined}
@@ -193,6 +197,7 @@ export function DevManageDrawerDialog(
     const [activeStep, setActiveStep] = useState(0);
     const [topUpAmount, setTopUpAmount] = useState<number>(0);
     const [selectedQuotaGb, setSelectedQuotaGb] = useState<number>(0);
+    const [isSaving, setIsSaving] = useState(false);
 
     const [data, setData] = useState<QuoteData>({});
     const [errorText, setError] = useState<string | null>(null);
@@ -286,13 +291,16 @@ export function DevManageDrawerDialog(
 
     const handleSave = async () => {
         try {
+            setIsSaving(true)
             const amount = parseEther(topUpAmount.toString())
             const size = toBytes(selectedQuotaGb)
             await ScDevService.updateStorageAccount(devId, devAddress, data.policyData, amount, size)
 
+            setIsSaving(false)
             startObserver()
         } catch (e) {
             console.error("[DevManageDrawerDialog.handleSave]:", e);
+            setIsSaving(false)
             setError(DefaultSnackbarError);
         }
     };
@@ -346,6 +354,7 @@ export function DevManageDrawerDialog(
                                 {activeStep === 1 && data.currentQuotaGb != null && (
                                     <FeesStep
                                         devId={devId}
+                                        devAddress={devAddress}
                                         selectedQuotaGb={selectedQuotaGb}
                                         topUpAmount={topUpAmount}
                                         currentQuotaGb={data.currentQuotaGb}
@@ -383,13 +392,14 @@ export function DevManageDrawerDialog(
                                         <>
                                             <AvoirSecondaryButton
                                                 text={str(RStr.Back)}
+                                                disabled={isSaving}
                                                 onClick={handleBack}
                                             />
 
                                             <AvoirButtons
                                                 text={str(RStr.Save)}
                                                 disabled={!hasChanges || !AmountSummaryHelper.isReady(feeState)}
-                                                loading={AmountSummaryHelper.isProcessing(feeState) || isObservingBuild}
+                                                loading={AmountSummaryHelper.isProcessing(feeState) || isSaving || isObservingBuild}
                                                 onClick={handleSave}
                                                 withIcon={false}
                                             />
@@ -406,10 +416,19 @@ export function DevManageDrawerDialog(
 }
 
 function useObserveQuote(devId: string | null, onSuccess: () => void) {
+    const greenfield = useGreenfield();
+
     const { isObservingBuild, startObserver } = useObserveGreenfield(
         async () => {
-            await sleep(7_500)
+            if (devId == null) {
+                console.error("Developer ID is not defined!")
+                return true
+            }
+
+            greenfield.clearQuoteCache(devId)
+            await sleep(5000)
             onSuccess()
+
             return true
         },
         [devId],

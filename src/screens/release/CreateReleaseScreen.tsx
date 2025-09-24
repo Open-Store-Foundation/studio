@@ -501,6 +501,7 @@ export function CreateReleaseScreen() {
                                     fees={{
                                         isReady: isReady,
                                         devId: devId,
+                                        devAddress: devAddress,
                                         retryKey: retry,
                                         estimation: estimateCall,
                                         onIncreaseQuota: () => setIsManageDrawerOpen(true),

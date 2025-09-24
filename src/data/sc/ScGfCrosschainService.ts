@@ -5,8 +5,8 @@ import {appConfig} from "@config";
 export class ScGfCrosschainService extends ScBaseService {
 
     static async relayFeesTotal() {
-        const { relayFee } = await ScGfCrosschainService.relayFees()
-        return relayFee // + minAckRelayFee
+        const { relayFee, minAckRelayFee } = await ScGfCrosschainService.relayFees()
+        return relayFee + minAckRelayFee
     }
 
     static async relayFees() {
