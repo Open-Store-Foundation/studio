@@ -300,7 +300,7 @@ export class GreenfieldClient {
             denom: 'BNB',
             gasLimit: Number(simulateInfo?.gasLimit),
             gasPrice: simulateInfo?.gasPrice || '5000000000',
-            payer: "0x7eeE0E672244f9f199C4d5B644D4351d14ee7D41",
+            payer: address,
             granter: '',
             signTypedDataCallback: signTypedDataCallback(account),
         })

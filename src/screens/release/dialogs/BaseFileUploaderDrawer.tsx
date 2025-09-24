@@ -145,7 +145,7 @@ export function BaseFileUploaderDrawer(
 
     const isTaskLoading = TaskStateCheck.isLoading(taskState)
     const canUpload = selectedFile != null
-        && (isReady == null || isReady)
+        && isReady !== false
         && AmountSummaryHelper.isReady(feeState)
         && !isTaskLoading
 

@@ -127,7 +127,7 @@ export class ApkFileUploadTask implements Task {
         const filePath = greenfield.apkPath(this.appInfo)
         const isFileExist = await greenfield.hasFile(this.devName, filePath)
         if (isFileExist) {
-            throw new Error('APK already exist!');
+            throw new Error('APK already exists!');
         }
 
         // Upload file
