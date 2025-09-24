@@ -9,9 +9,10 @@ export function prepare_en_locale(): Map<StrToken, string> {
     map.set(RStr.Retry, "Retry");
     map.set(RStr.Back, "Back");
     map.set(RStr.Continue, "Continue");
+    map.set(RStr.Confirm, "Confirm");
     map.set(RStr.Save, "Save");
     map.set(RStr.Next, "Next");
-    map.set(RStr.Cancel, "Cancel");
+    map.set(RStr.Delete, "Delete");
     map.set(RStr.TopUp, "Top up");
     map.set(RStr.TbnbGbPerMonth, "tBNB/GB/month");
     map.set(RStr.GbPerMonth, "GB/month");
@@ -140,7 +141,7 @@ export function prepare_en_locale(): Map<StrToken, string> {
     map.set(RStr.FeesForm_relayFee, "Relay fee");
     map.set(RStr.FeesForm_settlePrepayFee, "Settle & Prepay Fee");
     map.set(RStr.FeesForm_gasFee, "Gas fee");
-    map.set(RStr.FeesForm_storagePriceRate, "Monthly payment(storage and traffic) will change from {from} to {to} per week");
+    map.set(RStr.FeesForm_storagePriceRate, "Total monthly payment will change from {from} to {to} per week");
 
     map.set(RStr.TopupForm_description, "Add funds to your account");
     map.set(RStr.TopupForm_balanceTooLow, "Your balance is too low, please top up to continue!");
@@ -239,6 +240,8 @@ export function prepare_en_locale(): Map<StrToken, string> {
     map.set(RStr.AppStatusScreen_build_digestMismatch, "Digest mismatch");
     map.set(RStr.AppStatusScreen_build_tooManyChunks, "Too many chunks");
     map.set(RStr.AppStatusScreen_build_digestAlgoMissing, "Digest algo missing");
+    map.set(RStr.AppStatusScreen_build_hashMismatch, "Hash mismatch");
+    map.set(RStr.AppStatusScreen_build_incorrectCertFormat, "Incorrect certificate format");
     map.set(RStr.AppStatusScreen_build_unknownStatus, "Unknown status");
 
     map.set(RStr.AppBuildsScreen_title, "Builds overview");
@@ -423,6 +426,8 @@ export function prepare_en_locale(): Map<StrToken, string> {
     map.set(RStr.FileUploaderDrawer_uploading, "Uploading...");
     map.set(RStr.FileUploaderDrawer_dropZone_accept, "Drop your APK or AAB file here, or click to browse");
     map.set(RStr.FileUploaderDrawer_error_default, "Something went wrong. Please try again.");
+    map.set(RStr.FileUploaderDrawer_confirm_title, "Upload file");
+    map.set(RStr.FileUploaderDrawer_confirm_description, "Are you sure you want to upload this file?");
 
     map.set(RStr.LogoUploaderDrawer_title, "Upload app logo");
     map.set(RStr.LogoUploaderDrawer_button_close, "Close");
@@ -477,6 +482,8 @@ export function prepare_en_locale(): Map<StrToken, string> {
 
     map.set(RStr.ConfirmDeleteDrawerDialog_title, "Delete Build");
     map.set(RStr.ConfirmDeleteDrawerDialog_button_delete, "Delete Build");
+    map.set(RStr.ConfirmDeleteDrawerDialog_dialog_title, "Delete file");
+    map.set(RStr.ConfirmDeleteDrawerDialog_dialog_description, "Are you sure you want to delete this file?");
 
     map.set(RStr.ApkValidator_error_fileType, "File must be an APK or AAB file");
     map.set(RStr.ApkValidator_error_invalidFormat, "Invalid APK file format");

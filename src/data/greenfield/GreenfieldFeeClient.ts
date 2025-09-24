@@ -5,6 +5,7 @@ import {TimedCache} from "@utils/cache.ts";
 import {Address} from "viem";
 import {GasProvider} from "@data/sc/GasProvider.ts";
 import {GreenfieldHttpClient} from "./GreenfieldHttpClient.ts";
+import {Long} from "@bnb-chain/greenfield-cosmos-types/helpers";
 
 export type StoreFeeParams = {
     readPrice: Decimal;
@@ -201,7 +202,7 @@ export interface MsgGasParams {
 
 export interface MsgGasParams_FixedGasParams {
     /** fixed_gas is the gas cost for a fixed type msg */
-    fixedGas: bigint;
+    fixedGas: Long;
 }
 
 export enum GfMsgType {
@@ -245,6 +246,7 @@ export class GreenfieldFeeClient {
             result += fees.get(type) ?? 0n;
         }
 
+        console.log("getStorageGasFee", result, gasPrice)
         return result * gasPrice;
     }
 
@@ -360,8 +362,10 @@ export class GreenfieldFeeClient {
             {msgTypeUrls: MSG_TYPES}
         );
 
-        const types = new Map(fees.msgGasParams.map(obj =>
-            [obj.msgTypeUrl, obj.fixedType?.fixedGas || 0n]
+        const types = new Map(fees.msgGasParams.map(
+            obj => {
+                return [obj.msgTypeUrl, BigInt(obj.fixedType?.fixedGas?.toString() || "0")]
+            }
         ));
 
         return types;

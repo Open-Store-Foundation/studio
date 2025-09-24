@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import {sleep} from "@utils/sleep.ts";
 
-const MAX_TRIES = 24;
+const MAX_TRIES = 12;
 const POLL_INTERVAL_MS = 5_000;
 
 export function useObserveGreenfield<T>(poll: (data: T | null) => Promise<boolean>, queryKey: any[]) {
@@ -15,6 +15,7 @@ export function useObserveGreenfield<T>(poll: (data: T | null) => Promise<boolea
 
     useEffect(() => {
         if (!isStarted) {
+            console.log("Observation is not started");
             return
         }
 
@@ -24,14 +25,19 @@ export function useObserveGreenfield<T>(poll: (data: T | null) => Promise<boolea
             let tries = 0;
 
             while (tries < MAX_TRIES) {
+                console.log("Start observation iteration!");
+
                 if (!isStarted) {
+                    console.log("Observation stopped");
                     break
                 }
 
                 try {
+                    console.log("Polling...");
                     const isDone = await poll(data);
 
                     if (isDone) {
+                        console.log("Observation done");
                         setIsStarted(false)
                         break
                     }
@@ -39,9 +45,11 @@ export function useObserveGreenfield<T>(poll: (data: T | null) => Promise<boolea
                     console.error("Error while fetching build file", e);
                 }
 
+                console.log("Sleeping...");
                 await sleep(POLL_INTERVAL_MS)
 
                 if (isDisposed) {
+                    console.log("Observation disposed");
                     break
                 }
 

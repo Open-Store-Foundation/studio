@@ -22,11 +22,13 @@ import {Address} from "@data/CommonModels.ts";
 import {useAsyncEffect} from "@utils/state.ts";
 import {appConfig} from "@config";
 import {useObserveGreenfield} from "@hooks/useObserveGreenfield.ts";
+import {AvoirDialog} from "@components/basic/AvoirDialog.tsx";
 
 interface ConfirmDeleteDrawerDialogProps {
     open: boolean;
 
     devId: string;
+    devAddress: Address;
     appAddress: Address;
     buildFile: BuildFile;
 
@@ -39,6 +41,7 @@ export function ConfirmDeleteDrawerDialog({
     onClose,
     buildFile,
     devId,
+                                              devAddress,
     appAddress,
     onSuccess,
 }: ConfirmDeleteDrawerDialogProps) {
@@ -48,6 +51,7 @@ export function ConfirmDeleteDrawerDialog({
     const {switchChainAsync} = useSwitchChain();
 
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [errorText, setError] = useState<string | null>(null);
     const [state, setState] = useState<AmountSummaryState>(AmountSummaryState.Pending);
 
@@ -80,11 +84,12 @@ export function ConfirmDeleteDrawerDialog({
         setError(null);
 
         try {
-            await switchChainAsync({ chainId: appConfig.greenfieldChain.id })
+            const result = await switchChainAsync({ chainId: appConfig.greenfieldChain.id })
+            console.log("switch result ", result)
 
             const isSuccess = await greenfield.deleteObject(address, devId, buildFile.objectPath, connector)
             if (isSuccess) {
-                startObserver()
+                startObserver(buildFile)
             }
         } catch (error: Error | any) {
             console.error("Error deleting object", error.message)
@@ -109,6 +114,22 @@ export function ConfirmDeleteDrawerDialog({
                 }
             }}
         >
+            <AvoirDialog
+                open={isDialogOpen}
+                title={str(RStr.ConfirmDeleteDrawerDialog_dialog_title)}
+                description={str(RStr.ConfirmDeleteDrawerDialog_dialog_description)}
+                cancelText={str(RStr.Cancel)}
+                confirmText={str(RStr.Delete)}
+                confirmVariant={"error"}
+                loading={false}
+                disableConfirm={false}
+                onCancel={() => setIsDialogOpen(false)}
+                onConfirm={async () => {
+                    setIsDialogOpen(false);
+                    await handleDelete()
+                }}
+            />
+
             <AutoSnackbar
                 message={errorText}
                 onClose={() => setError(null)}
@@ -131,6 +152,7 @@ export function ConfirmDeleteDrawerDialog({
 
                                 <AmountsSummaryForm
                                     devId={devId}
+                                    devAddress={devAddress}
                                     onState={setState}
                                     onError={setError}
                                     storageMessages={storageMessages}
@@ -162,7 +184,7 @@ export function ConfirmDeleteDrawerDialog({
 
                                     <AvoirButtons
                                         text={str(RStr.ConfirmDeleteDrawerDialog_button_delete)}
-                                        onClick={handleDelete}
+                                        onClick={() => setIsDialogOpen(true)}
                                         loading={isDeleting || AmountSummaryHelper.isProcessing(state) || isCheckingStoreVersion || isObservingBuild}
                                         disabled={!AmountSummaryHelper.isReady(state) && !AmountSummaryHelper.isWarning(state)}
                                         withIcon={false}
@@ -192,11 +214,13 @@ function useObserveDeleteObject(devId: string | null, onSuccess: () => void) {
     const { isObservingBuild, startObserver } = useObserveGreenfield<BuildFile>(
         async (data) => {
             if (devId == null || data == null) {
+                console.log("useObserveDeleteObject: devId or data is null", devId, data == null)
                 return false
             }
 
             const hasFile = await greenfield.hasFile(devId, data.objectPath)
             if (!hasFile) {
+                console.log("File successfully deleted: ", devId, data.objectPath)
                 onSuccess()
                 return true
             }

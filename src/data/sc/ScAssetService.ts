@@ -200,7 +200,7 @@ export class ScAssetService extends ScBaseService {
             totalAmount += replyFees
         }
 
-        if (ownerInfo) {
+        if (ownerInfo && ownerInfo.domain.length > 0 && ownerInfo.proofs.length > 0) {
             const updateOwnerCalldata = encodeFunctionData(
                 this.paramsUpdateAppOwnerMulticall(sender, appAddress, ownerInfo)
             )
@@ -228,7 +228,7 @@ export class ScAssetService extends ScBaseService {
             totalAmount += oraclePrice
         }
 
-        if (distribution) {
+        if (distribution != null && distribution.type != ScAppDistributionType.Default && distribution.sources.length > 0) {
             const distrCalldata = encodeFunctionData(
                 this.paramsUpdateDistributionMulticall(sender, appAddress, distribution)
             )
@@ -503,6 +503,10 @@ export class ScAssetService extends ScBaseService {
         )
 
         return data as Address
+    }
+
+    static cleanAppsCache(devAddress: Address) {
+        this.cache().delete(CacheKeys.AppList.key(devAddress))
     }
 
     static async getApps(devAddress: Address): Promise<ScApp[]> {

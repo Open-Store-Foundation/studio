@@ -15,7 +15,7 @@ import {RStr} from "@localization/ids.ts";
 import {str} from "@localization/res.ts";
 import {DefaultScreenEmptyProps, ScreenEmpty} from "@components/basic/ScreenEmpty.tsx";
 import {AvoirSectionTitledBox} from "@components/basic/AvoirSection";
-import {IconTrash} from "@tabler/icons-react";
+import {IconRefresh, IconTrash} from "@tabler/icons-react";
 import {ConfirmDeleteDrawerDialog} from "./ConfirmDeleteDrawerDialog.tsx";
 
 export interface BuildFile {
@@ -29,7 +29,7 @@ export interface BuildFile {
 
 export function AppBuildsScreen() {
     const greenfield = useGreenfield();
-    const {devId, appPackage, appAddress} = AppRoute.AppAsset.useParams();
+    const {devId, devAddress, appPackage, appAddress} = AppRoute.AppAsset.useParams();
 
     const {isLoading, error, data, setState, retry, retryCount} = useScreenState<BuildFile[], string>()
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
@@ -105,6 +105,15 @@ export function AppBuildsScreen() {
                         title={str(RStr.AppBuildsScreen_list_title)}
                         description={str(RStr.AppBuildsScreen_list_description)}
                         infoLink={AppRoute.Article.route(AppRoute.Article.HowItWorks)}
+                        action={() => {
+                            return <IconButton
+                                color={"primary"}
+                                onClick={retry}
+                                disabled={isLoading}
+                            >
+                                <IconRefresh/>
+                            </IconButton>
+                        }}
                     >
                         {
                             data && data.length === 0
@@ -134,6 +143,7 @@ export function AppBuildsScreen() {
                     open={confirmDialogOpen}
 
                     devId={devId}
+                    devAddress={devAddress}
                     appAddress={appAddress}
                     buildFile={selectedBuildFile}
 

@@ -21,6 +21,21 @@ export class TimedCache {
         this.data = new Map()
     }
 
+    async getOrLoadOpt<T>(key: string, ttl: number, isForce: boolean, loader: () => Promise<any>) {
+        if (!isForce) {
+            const entry = this.data.get(key)
+            if (entry) {
+                return entry.data as T
+            }
+        }
+
+        const data = await loader() as T
+
+        this.set(key, data, ttl)
+
+        return data
+    }
+
     async getOrLoad<T>(key: string, ttl: number, loader: () => Promise<any>) {
         const entry = this.data.get(key)
         if (entry) {

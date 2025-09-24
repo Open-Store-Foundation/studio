@@ -28,6 +28,7 @@ export function AvoirTableView(
         return errorOverride()
     }
 
+
     return (
         <DataGrid
             rows={rows || []}

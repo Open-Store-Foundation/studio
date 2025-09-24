@@ -105,6 +105,7 @@ function InfoStep({
 
 interface SummaryStepProps {
     devId: string;
+    devAddress: Address;
     appPackage: string;
     appAddress: Address;
     newOwnerInfo: AppOwnerInfo;
@@ -116,6 +117,7 @@ interface SummaryStepProps {
 
 function SummaryStep({
     devId,
+    devAddress,
     appPackage,
     appAddress,
     newOwnerInfo,
@@ -187,6 +189,7 @@ function SummaryStep({
 
                     <AmountsSummaryForm
                         devId={devId}
+                        devAddress={devAddress}
                         onState={onStateChange}
                         onError={onError}
                         estimation={estimateCall}
@@ -211,7 +214,7 @@ function SummaryStep({
 export function AppEditOwnerVerificationScreen() {
     const navigate = useNavigate();
 
-    const {devId, appPackage, appAddress, isFetching} = AppRoute.OwnerValidation.useParams();
+    const {devId, devAddress, appPackage, appAddress, isFetching} = AppRoute.OwnerValidation.useParams();
 
     const [activeStep, setActiveStep] = useState(0);
     const [isSkipVerification, setIsSkipVerification] = useState(false);
@@ -516,6 +519,7 @@ export function AppEditOwnerVerificationScreen() {
                                 {activeStep === 1 && oracleData && newOwnerInfo && (
                                     <SummaryStep
                                         devId={devId}
+                                        devAddress={devAddress}
                                         appPackage={appPackage}
                                         appAddress={appAddress}
                                         oracleData={oracleData}

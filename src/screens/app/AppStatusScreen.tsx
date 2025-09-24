@@ -1,4 +1,4 @@
-import {Stack, Typography} from "@mui/material";
+import {IconButton, Stack, Typography} from "@mui/material";
 import {AvoirTableView} from "@components/basic/AvoirTableView.tsx";
 import {GridColDef} from "@mui/x-data-grid";
 import {ContentContainer, PageContainer} from "@components/layouts/BaseContainers.tsx";
@@ -25,6 +25,7 @@ import {ProtocolId, TrackId} from "@data/CommonModels.ts";
 import {ScreenEmpty} from "@components/basic/ScreenEmpty.tsx";
 import {RStr} from "@localization/ids.ts";
 import {str} from "@localization/res.ts";
+import {IconRefresh} from "@tabler/icons-react";
 
 export const renderOracleIcon = (sync: ScAppSyncState) => {
     if (sync.status == undefined) {
@@ -116,6 +117,7 @@ const renderBuildStatusIcon = (status: ApkValidationStatus) => {
         case ApkValidationStatus.InvalidApkFormat:
         case ApkValidationStatus.InvalidSignBlockFormat:
         case ApkValidationStatus.Zip64NotSupported:
+        case ApkValidationStatus.HashMismatch:
 
         // Group 20s
         case ApkValidationStatus.TooManySigners:
@@ -135,6 +137,7 @@ const renderBuildStatusIcon = (status: ApkValidationStatus) => {
         // Group 50s
         case ApkValidationStatus.NoCertificatesFound:
         case ApkValidationStatus.PubKeyFromCertMismatch:
+        case ApkValidationStatus.IncorrectCertFormat:
 
         // Group 60s
         case ApkValidationStatus.NoKnownDigestToCheck:
@@ -144,10 +147,6 @@ const renderBuildStatusIcon = (status: ApkValidationStatus) => {
 
         // Group 70s
         case ApkValidationStatus.ProofNotFound:
-        case ApkValidationStatus.IncorrectEncryptionData1:
-        case ApkValidationStatus.VersionIsOutdated:
-        case ApkValidationStatus.AssetlinkIsNotVerified:
-        case ApkValidationStatus.PublicKeyFormat:
         case ApkValidationStatus.InvalidProof:
             return <CancelOutlined color="error" fontSize={"small"}/>
 
@@ -193,10 +192,7 @@ const renderBuildStatusTitle = (status: ApkValidationStatus): string => {
 
         // Group 70s
         case ApkValidationStatus.ProofNotFound:
-        case ApkValidationStatus.IncorrectEncryptionData1:
-        case ApkValidationStatus.VersionIsOutdated:
-        case ApkValidationStatus.AssetlinkIsNotVerified:
-        case ApkValidationStatus.PublicKeyFormat:
+        case ApkValidationStatus.HashMismatch:
         case ApkValidationStatus.InvalidProof:
             return str(RStr.AppStatusScreen_build_error)
 
@@ -258,7 +254,11 @@ const renderBuildStatusMessage = (status: ApkValidationStatus) => {
         case ApkValidationStatus.DigestAlgorithmNotFound:
             return str(RStr.AppStatusScreen_build_digestAlgoMissing)
 
-        // TODO 70s
+        // Group 70s
+        case ApkValidationStatus.HashMismatch:
+            return str(RStr.AppStatusScreen_build_hashMismatch)
+        case ApkValidationStatus.IncorrectCertFormat:
+            return str(RStr.AppStatusScreen_build_incorrectCertFormat)
 
         default:
             return str(RStr.AppStatusScreen_build_unknownStatus)
@@ -398,6 +398,11 @@ export function AppStatusScreen() {
         retryCount: oracleRetryCount,
         retry: oracleRetry
     } = useScreenState<ScAppSyncState[], string>()
+    const retryWithoutCache = () => {
+        ScOracleService.clearLastState(appAddress)
+        oracleRetry()
+    }
+
     const {
         isLoading: isPublishLoading,
         error: publishError,
@@ -425,7 +430,6 @@ export function AppStatusScreen() {
             try {
                 setPublishState(S.loading())
                 const publishing = await publishingRepo.getPublishing(appAddress)
-                console.log(publishing)
                 setPublishState(S.data(publishing))
             } catch (e) {
                 console.error(e)
@@ -452,14 +456,26 @@ export function AppStatusScreen() {
                         description={str(RStr.AppStatusScreen_dataVerification_description)}
                         infoLink={AppRoute.Article.route(AppRoute.Article.Publishing)}
                         action={() => {
-                            return <AvoirButtons
-                                text={str(RStr.AppStatusScreen_dataVerification_manageButton)}
-                                onClick={() => {
-                                    navigate(
-                                        AppRoute.OwnerValidation.route(devId, appPackage, devAddress, appAddress)
-                                    )
-                                }}
-                            />
+                            return (
+                                <Stack spacing={2} direction={"row"}>
+                                    <IconButton
+                                        color={"primary"}
+                                        onClick={retryWithoutCache}
+                                        disabled={isFetching || isLoading}
+                                    >
+                                        <IconRefresh/>
+                                    </IconButton>
+
+                                    <AvoirButtons
+                                        text={str(RStr.AppStatusScreen_dataVerification_manageButton)}
+                                        onClick={() => {
+                                            navigate(
+                                                AppRoute.OwnerValidation.route(devId, appPackage, devAddress, appAddress)
+                                            )
+                                        }}
+                                    />
+                                </Stack>
+                            )
                         }}>
 
                         <AvoirTableView
@@ -484,14 +500,26 @@ export function AppStatusScreen() {
                         description={str(RStr.AppStatusScreen_buildChannels_description)}
                         infoLink={AppRoute.Article.route(AppRoute.Article.Publishing)}
                         action={() => {
-                            return <AvoirButtons
-                                text={str(RStr.AppStatusScreen_buildChannels_manageButton)}
-                                onClick={() => {
-                                    navigate(
-                                        AppRoute.AppNewRelease.route(devId, appPackage, devAddress, appAddress)
-                                    )
-                                }}
-                            />
+                            return (
+                                <Stack spacing={2} direction={"row"}>
+                                    <IconButton
+                                        color={"primary"}
+                                        onClick={publishRetry}
+                                        disabled={isFetching || isPublishLoading}
+                                    >
+                                        <IconRefresh/>
+                                    </IconButton>
+
+                                    <AvoirButtons
+                                        text={str(RStr.AppStatusScreen_buildChannels_manageButton)}
+                                        onClick={() => {
+                                            navigate(
+                                                AppRoute.AppNewRelease.route(devId, appPackage, devAddress, appAddress)
+                                            )
+                                        }}
+                                    />
+                                </Stack>
+                            )
                         }}>
 
                         {

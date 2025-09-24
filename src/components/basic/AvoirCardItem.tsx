@@ -38,6 +38,7 @@ export function AvoirCardItem({
             <Box flex={1}>
                 <Typography variant="subtitle1" sx={{fontWeight: 700}}>{title}</Typography>
             </Box>
+
             {right ?? (<ChevronRightRounded fontSize="small" sx={{ color: 'text.secondary' }} />)}
         </Box>
     )

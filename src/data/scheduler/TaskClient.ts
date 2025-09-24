@@ -123,19 +123,23 @@ export class ApkFileUploadTask implements Task {
             appConfig.greenfieldChain.id, this.owner, appConfig.provider()
         );
 
+
+        const filePath = greenfield.apkPath(this.appInfo)
+        const isFileExist = await greenfield.hasFile(this.devName, filePath)
+        if (isFileExist) {
+            throw new Error('APK already exist!');
+        }
+
         // Upload file
         const request: DelegateCreateParams = {
             bucket: this.devName.toLowerCase(),
-            path: greenfield.apkPath(this.appInfo),
+            path: filePath,
             file: this.file,
+            isUpdate: false,
             onProgress: onProgress
         };
 
         await greenfield.delegatedCreateObject(auth!, request);
-        // for (let i = 0; i < 10; i++) {
-        //     await new Promise(resolve => setTimeout(resolve, 1000));
-        //     onProgress(i * 10);
-        // }
     }
 }
 
@@ -189,19 +193,17 @@ export class LogoUploadTask implements Task {
         );
 
         const logoPath = greenfield.logoPath(this.appPackage);
+        const isFileExist = await greenfield.hasFile(this.devName, logoPath)
 
         const request: DelegateCreateParams = {
             bucket: this.devName.toLowerCase(),
             path: logoPath,
             file: this.file,
-            onProgress: onProgress
+            isUpdate: isFileExist,
+            onProgress: onProgress,
         };
 
         await greenfield.delegatedCreateObject(auth!, request);
-        // for (let i = 0; i < 10; i++) {
-        //     await new Promise(resolve => setTimeout(resolve, 1000));
-        //     onProgress(i * 10);
-        // }
     }
 }
 

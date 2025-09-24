@@ -55,6 +55,7 @@ export interface AppDrawerProps {
     backLink?: string
     onClose?: () => void
     onBack?: () => void
+    showTasks?: boolean
 }
 
 export function AvoirDrawer(

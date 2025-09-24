@@ -94,16 +94,18 @@ export function AvoirToolbar(
     }
 
     const renderOpenTasks = (count: number = 0) => {
-        return (
-            <IconButton
-                color={"primary"}
-                onClick={onOpenTasks}
-            >
-                <Badge badgeContent={count} color="error">
-                    <IconListDetails/>
-                </Badge>
-            </IconButton>
-        )
+        if (onOpenTasks != null) {
+            return (
+                <IconButton
+                    color={"primary"}
+                    onClick={onOpenTasks}
+                >
+                    <Badge badgeContent={count} color="error">
+                        <IconListDetails/>
+                    </Badge>
+                </IconButton>
+            )
+        }
     }
 
     const renderSwitchTheme = () => {

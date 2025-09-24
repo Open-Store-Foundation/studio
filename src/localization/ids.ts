@@ -6,9 +6,11 @@ export class RStr {
     static Retry: StrToken = "Retry";
     static Back: StrToken = "Back";
     static Continue: StrToken = "Continue";
+    static Confirm: StrToken = "Confirm";
     static Save: StrToken = "Save";
     static Next: StrToken = "Next";
     static Cancel: StrToken = "Cancel";
+    static Delete: StrToken = "Delete";
     static TopUp: StrToken = "TopUp";
     static TbnbGbPerMonth: StrToken = "TbnbGbPerMonth";
     static Enabled: StrToken = "AppSourcesForm.enabled";
@@ -236,6 +238,8 @@ export class RStr {
     static AppStatusScreen_build_digestMismatch: StrToken = "AppStatusScreen.build.digestMismatch";
     static AppStatusScreen_build_tooManyChunks: StrToken = "AppStatusScreen.build.tooManyChunks";
     static AppStatusScreen_build_digestAlgoMissing: StrToken = "AppStatusScreen.build.digestAlgoMissing";
+    static AppStatusScreen_build_hashMismatch: StrToken = "AppStatusScreen.build.hashMismatch";
+    static AppStatusScreen_build_incorrectCertFormat: StrToken = "AppStatusScreen.build.incorrectCertFormat";
     static AppStatusScreen_build_unknownStatus: StrToken = "AppStatusScreen.build.unknownStatus";
 
     static AppBuildsScreen_title: StrToken = "AppBuildsScreen.title";
@@ -420,6 +424,8 @@ export class RStr {
     static FileUploaderDrawer_uploading: StrToken = "FileUploaderDrawer.uploading";
     static FileUploaderDrawer_dropZone_accept: StrToken = "FileUploaderDrawer.dropZone.accept";
     static FileUploaderDrawer_error_default: StrToken = "FileUploaderDrawer.error.default";
+    static FileUploaderDrawer_confirm_title: StrToken = "FileUploaderDrawer.confirm.title";
+    static FileUploaderDrawer_confirm_description: StrToken = "FileUploaderDrawer.confirm.description";
 
     static LogoUploaderDrawer_title: StrToken = "LogoUploaderDrawer.title";
     static LogoUploaderDrawer_button_close: StrToken = "LogoUploaderDrawer.button.close";
@@ -474,6 +480,8 @@ export class RStr {
 
     static ConfirmDeleteDrawerDialog_title: StrToken = "ConfirmDeleteDrawerDialog.title";
     static ConfirmDeleteDrawerDialog_button_delete: StrToken = "ConfirmDeleteDrawerDialog.button.delete";
+    static ConfirmDeleteDrawerDialog_dialog_title: StrToken = "ConfirmDeleteDrawerDialog.dialog.title";
+    static ConfirmDeleteDrawerDialog_dialog_description: StrToken = "ConfirmDeleteDrawerDialog.dialog.description";
 
     static ApkValidator_error_fileType: StrToken = "ApkValidator.error.fileType";
     static ApkValidator_error_invalidFormat: StrToken = "ApkValidator.error.invalidFormat";

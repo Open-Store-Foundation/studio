@@ -21,7 +21,7 @@ interface FileDrawerProps {
 }
 
 export function FileDrawerDialog({open, type, onSelected, onClose}: FileDrawerProps) {
-    const {devId, appPackage, address, appAddress} = AppRoute.AppAsset.useParams();
+    const {devId, devAddress, appPackage, address, appAddress} = AppRoute.AppAsset.useParams();
 
     return (
         <Drawer
@@ -44,6 +44,7 @@ export function FileDrawerDialog({open, type, onSelected, onClose}: FileDrawerPr
                             ? <ApkUploaderDrawer
                                 address={address}
                                 appAddress={appAddress}
+                                devAddress={devAddress}
                                 devId={devId}
                                 appPackage={appPackage}
 

@@ -170,6 +170,7 @@ def sign_with_external_tools(jks_path, jks_pass, alias, alias_pass, app_hex):
         debug_print(f"\n--- Step 1: Converting JKS (alias: '{alias}') to PKCS12 using keytool ---")
         keytool_command_export = [
             'keytool', '-importkeystore',
+            '-srcstoretype', "JKS",
             '-srckeystore', jks_path,
             '-srcstorepass', jks_pass,
             '-srcalias', alias,

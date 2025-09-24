@@ -20,6 +20,16 @@ export function absMulNumber(a: number, b: number, fixed: number = 2): string {
         .toFixed(fixed)
 }
 
+export function absSubtract(a: bigint, b: bigint): bigint {
+    return BigInt(
+        dec(a)
+            .absoluteValue()
+            .plus(dec(b))
+            .negated()
+            .toFixed(0)
+    )
+}
+
 export function formatBigNumber(value: bigint, fixed?: number): number {
     return formatDecimal(Number(formatEther(value)), fixed)
 }

@@ -168,6 +168,12 @@ export class ScOracleService extends ScBaseService {
         return statuses;
     }
 
+    static clearLastState(appAddress: Address) {
+        this.cache().delete(
+            CacheKeys.OracleStatus.key(appAddress)
+        )
+    }
+
     static async getLastState(appAddress: Address) {
         let data: ScAppSyncData = await this.cache().getOrLoad(
             CacheKeys.OracleStatus.key(appAddress), CacheKeys.OracleStatus.ttl,

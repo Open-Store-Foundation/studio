@@ -98,6 +98,7 @@ export function QuotaManagementForm(
                         <Slider
                             value={sliderValue}
                             onChange={handleSliderChange}
+                            disabled={currentQuotaGb == null}
                             min={0}
                             max={100}
                             step={0.1}
@@ -242,17 +243,17 @@ export function QuotaManagementForm(
                                         '& .MuiOutlinedInput-input': {
                                             padding: '6px 12px',
                                         },
-                                                                '& input[type=number]': {
-                            MozAppearance: 'textfield',
-                        },
-                        '& input[type=number]::-webkit-outer-spin-button': {
-                            WebkitAppearance: 'none',
-                            margin: 0,
-                        },
-                        '& input[type=number]::-webkit-inner-spin-button': {
-                            WebkitAppearance: 'none',
-                            margin: 0,
-                        },
+                                        '& input[type=number]': {
+                                            MozAppearance: 'textfield',
+                                        },
+                                        '& input[type=number]::-webkit-outer-spin-button': {
+                                            WebkitAppearance: 'none',
+                                            margin: 0,
+                                        },
+                                        '& input[type=number]::-webkit-inner-spin-button': {
+                                            WebkitAppearance: 'none',
+                                            margin: 0,
+                                        },
                                     }}
                                 />
 

@@ -9,6 +9,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 export interface RichTextFieldProps {
     value?: string;
+    defaultValue?: string;
     label?: string;
     helperText?: string;
     placeholder?: string;
@@ -37,6 +38,7 @@ export interface RichTextFieldProps {
 export function AvoirTextField(
     {
         value,
+        defaultValue,
         label,
         helperText,
         placeholder,
@@ -81,6 +83,7 @@ export function AvoirTextField(
                     multiline={multiline}
                     label={label}
                     id={id}
+                    defaultValue={defaultValue}
                     name={name}
                     onChange={onChange}
                     disabled={disabled}

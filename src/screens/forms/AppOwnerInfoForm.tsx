@@ -13,6 +13,7 @@ import {FormFieldProps, RenderEditButton} from "@screens/forms/form.tsx";
 import {RStr} from "@localization/ids.ts";
 import {str} from "@localization/res.ts";
 import {useMemo} from "react";
+import {appConfig} from "@config";
 
 export function parseProofs(certs: AppCertificateProof[]) {
     const proofs = certs.map((_, i) => {
@@ -156,6 +157,7 @@ export interface AppOwnerInfoEditFormProps {
     newCertificatesProps: CertificateProofTextFieldsProps;
 }
 
+// TODO V3 investigate if it's OK to have defaultValue instead of value here
 export function AppOwnerInfoEditForm(
     {
         domain,
@@ -365,7 +367,7 @@ export function CertificateProofTextField({index, isLoading, cert, onDeleteCerti
                 action={index >= 1 || isFirstRemovable ? FieldAction.Delete : FieldAction.None}
                 onAction={() => onDeleteCertificate(cert.ordinal)}
                 actionDisabled={isActionDisabled}
-                value={cert.fingerprint || ""}
+                defaultValue={cert.fingerprint || ""}
                 maxRows={3}
                 multiline
                 grow
@@ -379,7 +381,7 @@ export function CertificateProofTextField({index, isLoading, cert, onDeleteCerti
                 placeholder={str(RStr.AppOwnerInfoForm_proof_placeholder)}
                 id={`proof-${index}`}
                 name="Proof 1"
-                value={cert.proof || ""}
+                defaultValue={cert.proof || ""}
                 maxRows={5}
                 multiline
                 grow
@@ -403,7 +405,7 @@ export function CertificateProofInstruction({appAddress}: { appAddress: Address 
                 <Typography variant="body2" color="text.secondary">
                     {str(RStr.AppOwnerInfoForm_how_to_generate_step1)}
                     <Link
-                        href="https://github.com/OpenStore/console/blob/main/scripts/proof_gen.py"
+                        href={appConfig.proofGenLUrl}
                         target="_blank" rel="noopener">
                         {str(RStr.AppOwnerInfoForm_this_link)}
                     </Link>
@@ -433,7 +435,7 @@ export function CertificateProofInstruction({appAddress}: { appAddress: Address 
                         mb: 1
                     }}
                 >
-                    python proof_gen.py -jks-path=path/to/keystore.jks -alias=your_alias
+                    python3 proof_gen.py -jks-path=path/to/keystore.jks -alias=your_alias
                     -address={caseAddress}
                 </Typography>
             </Stack>

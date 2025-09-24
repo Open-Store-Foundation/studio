@@ -15,10 +15,12 @@ import {RStr} from "@localization/ids.ts";
 import {str} from "@localization/res.ts";
 import {FileValidator} from "@utils/validators.ts";
 import {Task, TaskEvent, TaskState, TaskStateCheck, TaskStatus} from "@data/scheduler/TaskClient.ts";
+import {AvoirDialog} from "@components/basic/AvoirDialog.tsx";
 
 
 export interface BaseFileUploaderProps {
     devId: string,
+    devAddress: Address,
     appPackage: string,
     address: Address,
 
@@ -39,6 +41,7 @@ export interface BaseFileUploaderProps {
 export function BaseFileUploaderDrawer(
     {
         devId,
+        devAddress,
         appPackage,
         address,
 
@@ -64,6 +67,7 @@ export function BaseFileUploaderDrawer(
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [uploadProgress, setUploadProgress] = useState<number>(0);
     const [feeState, setFeeState] = useState<AmountSummaryState>(AmountSummaryState.Pending);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const handleNext = async () => {
         const task = await uploadTask();
@@ -139,9 +143,11 @@ export function BaseFileUploaderDrawer(
         onSelected(file)
     };
 
+    const isTaskLoading = TaskStateCheck.isLoading(taskState)
     const canUpload = selectedFile != null
-        && isReady
-        && AmountSummaryHelper.isReady(feeState);
+        && (isReady == null || isReady)
+        && AmountSummaryHelper.isReady(feeState)
+        && !isTaskLoading
 
     return (
         <PageContainer>
@@ -152,11 +158,24 @@ export function BaseFileUploaderDrawer(
                 }}
             />
 
+            <AvoirDialog
+                open={isDialogOpen}
+                title={str(RStr.FileUploaderDrawer_confirm_title)}
+                description={str(RStr.FileUploaderDrawer_confirm_description)}
+                cancelText={str(RStr.Cancel)}
+                confirmText={str(RStr.FileUploaderDrawer_button_upload)}
+                onCancel={() => setIsDialogOpen(false)}
+                onConfirm={async () => {
+                    setIsDialogOpen(false);
+                    await handleNext()
+                }}
+            />
+
             <AvoirScreenTitleSmall
                 title={title}
             />
 
-            <ContentContainer sx={{ pb: 3 }}>
+            <ContentContainer sx={{ pb: 0 }}>
                 <Stack
                     width={"100%"}
                     height={"100%"}
@@ -166,7 +185,7 @@ export function BaseFileUploaderDrawer(
                         onFileSelect={handleFileSelect}
                         selectedFile={selectedFile}
                         accept={validator.getAcceptedTypes()}
-                        isLoading={TaskStateCheck.isLoading(taskState)}
+                        isLoading={isTaskLoading}
                         isProcessing={isLoading}
                         progress={uploadProgress}
                         title={validator.getDropZoneTitle()}
@@ -183,11 +202,13 @@ export function BaseFileUploaderDrawer(
                         {additionForm}
 
                         <AmountsSummaryForm
+                            devAddress={devAddress}
                             devId={devId}
                             onState={setFeeState}
                             onError={setError}
                             storageMessages={selectedFile ? [GfMsgType.CREATE_OBJECT] : undefined}
                             fileSize={selectedFile?.size}
+                            isReady={isReady}
 
                             quoteRequirement={undefined}
                             estimation={undefined}
@@ -203,20 +224,20 @@ export function BaseFileUploaderDrawer(
 
                     <Box flexGrow={1}/>
 
-                    <Stack width={"100%"} direction={"row"} justifyContent={"end"} spacing={2}>
+                    <Stack width={"100%"} direction={"row"} justifyContent={"end"} spacing={2} pb={3}>
                         <AvoirSecondaryButton
                             text={str(RStr.FileUploaderDrawer_button_close)}
                             onClick={onClose}
                         />
 
                         <AvoirButtons
-                            text={TaskStateCheck.isLoading(taskState) 
+                            text={isTaskLoading
                                 ? `${str(RStr.FileUploaderDrawer_uploading)} ${Math.round(uploadProgress)}%`
                                 : str(RStr.FileUploaderDrawer_button_upload)
                             }
                             disabled={!canUpload}
-                            onClick={handleNext}
-                            loading={TaskStateCheck.isLoading(taskState) || AmountSummaryHelper.isProcessing(feeState)}
+                            onClick={() => setIsDialogOpen(true)}
+                            loading={isTaskLoading || AmountSummaryHelper.isLoading(feeState)}
                             withIcon={false}
                         />
                     </Stack>

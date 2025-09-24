@@ -272,6 +272,7 @@ function SummaryStep({
 
                     <AmountsSummaryForm
                         devId={devId}
+                        devAddress={devAddress}
                         onState={onStateChange}
                         onError={onError}
                         estimation={estimateCall}
@@ -351,7 +352,8 @@ export function CreateAppScreen() {
     useEffect(() => {
         if (data && appAddress) {
             console.log("Owner setup successful, navigating...")
-            navigate(AppRoute.AppAsset.route(devId, packageName, devAddress, appAddress), {replace: true})
+
+            navigate(AppRoute.AppInfo.route(devId, packageName, devAddress, appAddress), {replace: true, preventScrollReset: false})
         }
     }, [data, navigate, devId, packageName, devAddress, appAddress])
 
