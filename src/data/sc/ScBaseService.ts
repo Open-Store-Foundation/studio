@@ -1,4 +1,4 @@
-import {useCache, useEtherscan, useGasProvider, useWallet} from "@di";
+import {useCache, useGraph, useGasProvider, useWallet} from "@di";
 import {PluginMulticallAbi} from "@data/sc/abi/PluginMulticall.ts";
 import {appConfig} from "@config";
 import {Address} from "@data/CommonModels.ts";
@@ -24,8 +24,8 @@ export abstract class ScBaseService {
         return useWallet()
     }
 
-    protected static get etherscan() {
-        return useEtherscan()
+    protected static get graph() {
+        return useGraph()
     }
 
     protected static get reader() {

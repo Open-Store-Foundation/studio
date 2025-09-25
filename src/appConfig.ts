@@ -113,7 +113,7 @@ export const appConfig = {
     },
 
     greenfieldAuthTtl: gfAuthTtl(),
-    etherscanKey: etherscanKey(),
+    graphNodeUrl: graphNodeUrl(),
     provider: () => window.ethereum!,
 
     defaultAppProtocolId: ProtocolId.Greenfield,
@@ -130,8 +130,8 @@ export const appConfig = {
     globalApiClientVersion: 1,
 }
 
-function etherscanKey() {
-    return import.meta.env.VITE_ETHERSCAN_KEY!!
+function graphNodeUrl() {
+    return import.meta.env.VITE_GRAPH_NODE!!
 }
 
 function projectId() {

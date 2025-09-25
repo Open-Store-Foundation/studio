@@ -12,10 +12,10 @@ export const greenfieldTestnet: Chain = /*#__PURE__*/
             },
             rpcUrls: {
                 default: {
-                    http: ['https://gnfd-testnet-fullnode-tendermint-us.bnbchain.org'],
+                    http: [import.meta.env.VITE_GREENFIELD_NODE!!],
                 },
                 public: {
-                    http: ['https://gnfd-testnet-fullnode-tendermint-us.bnbchain.org'],
+                    http: [import.meta.env.VITE_GREENFIELD_NODE!!],
                 },
             },
             blockExplorers: {

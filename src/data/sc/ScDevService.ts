@@ -2,7 +2,7 @@ import {decodeEventLog, encodeFunctionData, Hex, Log, parseAbiItem} from "viem";
 import {appConfig} from "@config";
 import {DevStorage} from "@data/storage/DevStorage.ts";
 import {Address} from "@data/CommonModels.ts";
-import {EventFragment, id, ZeroAddress, zeroPadValue} from "ethers";
+import {EventFragment, id, ZeroAddress} from "ethers";
 import {ScBaseService, ScMulticallData} from "@data/sc/ScBaseService.ts";
 import {CacheKeys} from "@data/cache.ts";
 import {GreenfieldClient} from "@data/greenfield";
@@ -22,7 +22,7 @@ interface DevAccountCreated {
 }
 
 export interface DevAccount {
-    id: string;
+    name: string;
     address: Address;
 }
 
@@ -391,24 +391,10 @@ export class ScDevService extends ScBaseService {
         return await this.cache().getOrLoad(
             CacheKeys.DevList.key(owner), CacheKeys.DevList.ttl,
             async () => {
-                const logs = await this.etherscan.getLogs(
-                    {
-                        address: appConfig.contracts.devFactory,
-                        topic0: ScDevService.devAccountCreatedTopic(),
-                        topic1: zeroPadValue(owner, 32),
-                        fromBlock: appConfig.startBlock,
-                    }
-                )
-
-                return logs.result.map((log) => {
-                    const event = ScDevService.decodeDevAccountCreateEvent(log)
-
-                    return {
-                        id: event.name,
-                        address: event.account,
-                    } as DevAccount
-                })
-            })
+                const logs = await this.graph.getPublishers(owner)
+                return logs
+            }
+        )
     }
 }
 
