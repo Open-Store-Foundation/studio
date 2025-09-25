@@ -3,6 +3,12 @@ import {Address} from "@data/CommonModels.ts";
 import {DevAccount} from "@data/sc/ScDevService.ts";
 import {ScApp} from "@data/sc/ScAssetService.ts";
 
+// TODO Change format in worker GraphQL
+interface GraphApp {
+    id: Address,
+    appId: string,
+    name: string,
+}
 
 export class GraphApiClient {
     private http: AxiosInstance;
@@ -21,15 +27,12 @@ export class GraphApiClient {
 
     async getApps(devAddress: Address): Promise<ScApp[]> {
         const response = await this.http.get(`/apps/${devAddress}`);
-        const apps = response.data.apps.map((log: unknown, id: number) => {
+        const apps = response.data.apps.map((app: GraphApp, id: number) => {
             const data = {
                 id: id,
-                // @ts-ignore
-                address: log.id,
-                // @ts-ignore
-                package: log.appId,
-                // @ts-ignore
-                name: log.name,
+                address: app.id,
+                package: app.appId,
+                name: app.name,
                 avatar: null,
             } as ScApp;
 
