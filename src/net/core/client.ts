@@ -18,9 +18,6 @@ export interface HttpResponse<T> {
 const instance: AxiosInstance = axios.create({
     withCredentials: true,
     timeout: 10000,
-    headers: {
-        "X-Api-Version": appConfig.globalApiClientVersion
-    }
 });
 
 const isHandlerEnabled = (config: AxiosRequestConfig = {}): boolean => {

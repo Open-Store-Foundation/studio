@@ -126,8 +126,6 @@ export const appConfig = {
     maxCertCount: 5,
 
     buildQuoteMultiplayer: 10,
-
-    globalApiClientVersion: 1,
 }
 
 function graphNodeUrl() {
