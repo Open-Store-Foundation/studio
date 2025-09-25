@@ -513,18 +513,8 @@ export class ScAssetService extends ScBaseService {
         return await this.cache().getOrLoad(
             CacheKeys.AppList.key(devAddress), CacheKeys.AppList.ttl,
             async () => {
-
-                const logs = await this.etherscan.getLogs({
-                    address: devAddress,
-                    topic0: this.getAppCreatedEventTopic(),
-                    fromBlock: appConfig.startBlock,
-                })
-
-                let result = logs.result.map((log, id) => {
-                    return this.decodeAppCreatedEvent(id, log)
-                })
-
-                return result
+                const logs = await this.graph.getApps(devAddress)
+                return logs
             })
     }
 

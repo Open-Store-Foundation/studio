@@ -129,20 +129,20 @@ export function IntroDevsScreen() {
                                 accounts && accounts.length > 0
                                     ? (
                                         accounts.map((item) => (
-                                            <ListItem key={item.id}>
+                                            <ListItem key={item.name}>
                                                 <ListItemButton
                                                     onClick={() => {
-                                                        navigate(AppRoute.DevAccount.route(item.id, item.address))
+                                                        navigate(AppRoute.DevAccount.route(item.name, item.address))
                                                     }}
                                                     sx={{ ...NoRadius }}
                                                 >
                                                     <ListItemAvatar>
-                                                        <DefaultAvatar name={item.id}/>
+                                                        <DefaultAvatar name={item.name}/>
                                                     </ListItemAvatar>
 
                                                     <ListItemText
                                                         style={{color: 'textSecondary'}}
-                                                        primary={<Typography>{item.id}</Typography>}/>
+                                                        primary={<Typography>{item.name}</Typography>}/>
 
                                                 </ListItemButton>
                                             </ListItem>

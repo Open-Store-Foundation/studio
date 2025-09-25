@@ -132,10 +132,10 @@ export function AltIntroDevsScreen() {
                                             accounts && accounts.length > 0 && (
                                                 accounts.map((item) => (
                                                     <AvoirCardItem
-                                                        key={item.id}
-                                                        onClick={() => navigate(AppRoute.DevAccount.route(item.id, item.address))}
-                                                        left={<DefaultAvatar name={item.id} size={40}/>}
-                                                        title={item.id}
+                                                        key={item.name}
+                                                        onClick={() => navigate(AppRoute.DevAccount.route(item.name, item.address))}
+                                                        left={<DefaultAvatar name={item.name} size={40}/>}
+                                                        title={item.name}
                                                         right={<Chip label="Greenfield" size="small" color="primary"
                                                                      variant="filled" sx={{
                                                             fontWeight: 600,
