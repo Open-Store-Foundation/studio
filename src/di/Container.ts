@@ -23,7 +23,7 @@ class DI {
 
     Graph = new GraphApiClient(appConfig.graphNodeUrl);
     GasProvider: GasProvider = new GasProvider(this.Wallet, this.Cache)
-    GreenfieldHttpClient: GreenfieldHttpClient = new GreenfieldHttpClient("https://gnfd-testnet-fullnode-tendermint-us.bnbchain.org:443")
+    GreenfieldHttpClient: GreenfieldHttpClient = new GreenfieldHttpClient(GreenNetwork.Testnet.rpc)
     Greenfield: GreenfieldClient = new GreenfieldClient(GreenNetwork.Testnet, this.GreenfieldHttpClient, this.GasProvider, this.Cache)
 
     Repo = {

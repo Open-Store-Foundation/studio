@@ -95,7 +95,7 @@ export const appConfig = {
         metadata: {
             name: 'Open Store Studio',
             description: 'Create and Publish decentralized apps',
-            url: 'https://openstore.foundation',
+            url: 'https://studio.openstore.foundation',
             icons: []
         },
         chains: chains[chainEnv]!! as [AppKitNetwork, ...AppKitNetwork[]],
@@ -114,6 +114,7 @@ export const appConfig = {
 
     greenfieldAuthTtl: gfAuthTtl(),
     graphNodeUrl: graphNodeUrl(),
+    grfdNodeUrl: grfdNodeUrl(),
     provider: () => window.ethereum!,
 
     defaultAppProtocolId: ProtocolId.Greenfield,
@@ -126,8 +127,10 @@ export const appConfig = {
     maxCertCount: 5,
 
     buildQuoteMultiplayer: 10,
+}
 
-    globalApiClientVersion: 1,
+function grfdNodeUrl() {
+    return import.meta.env.VITE_GREENFIELD_NODE!!
 }
 
 function graphNodeUrl() {

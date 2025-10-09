@@ -70,7 +70,6 @@ export class RStr {
     static AppSourcesForm_distribution_info_title: StrToken = "AppSourcesForm.distribution_info_title";
     static AppSourcesForm_custom_distribution_title: StrToken = "AppSourcesForm.custom_distribution_title";
     static AppSourcesForm_sources_count_title: StrToken = "AppSourcesForm.sources_count_title";
-    static AppSourcesForm_some_description_to_specify_what_we_can_do_here_or_not: StrToken = "AppSourcesForm.some_description_to_specify_what_we_can_do_here_or_not";
     static AppSourcesForm_custom_distribution_enabled: StrToken = "AppSourcesForm_custom_distribution_enabled";
     static AppSourcesForm_custom_distribution_disabled: StrToken = "AppSourcesForm_custom_distribution_disabled";
     static AppSourcesForm_source_url_label: StrToken = "AppSourcesForm.source_url.label";

@@ -27,9 +27,9 @@ export function prepare_en_locale(): Map<StrToken, string> {
     map.set(RStr.NotFound, "Not found anything :(");
 
     map.set(RStr.AppOwnerInfoForm_title, "Ownership info");
-    map.set(RStr.AppOwnerInfoForm_description, "Without ownership verification it's only possible to find application by address!"); // TODO
+    map.set(RStr.AppOwnerInfoForm_description, "Provide ownership details to verify your app and show users the official website that owns it.");
     map.set(RStr.AppOwnerInfoForm_website_label, "Website");
-    map.set(RStr.AppOwnerInfoForm_website_helper, "Website for ownership verification through '.well-known/assetlinks.json'"); // TODO learn more
+    map.set(RStr.AppOwnerInfoForm_website_helper, "Website for ownership verification through '.well-known/assetlinks.json'");
     map.set(RStr.AppOwnerInfoForm_website_error, "Website shouldn't have path");
     map.set(RStr.AppOwnerInfoForm_certificate_label, "Certificate #");
     map.set(RStr.AppOwnerInfoForm_certificate_fingerprint_helper, "SHA-256 fingerprint of certificate");
@@ -70,11 +70,10 @@ export function prepare_en_locale(): Map<StrToken, string> {
     map.set(RStr.AppSourcesForm_custom_distribution_label, "Enable custom distribution");
     map.set(RStr.AppSourcesForm_source_label, "Source");
     map.set(RStr.AppSourcesForm_add_source_button, "Add Source");
-    map.set(RStr.AppSourcesForm_field_description, "You can use dynamic parameters VERSION_CODE/VERSION_NAME/REF_ID in source link (e.g. https://example.com/download/${VERSION_CODE}/app.apk)");
+    map.set(RStr.AppSourcesForm_field_description, "You can use dynamic parameters VERSION_CODE/VERSION_NAME/REF_ID/CHECKSUM in source link (e.g. https://example.com/download/${VERSION_CODE}/app.apk)");
     map.set(RStr.AppSourcesForm_distribution_info_title, "Distribution info");
     map.set(RStr.AppSourcesForm_custom_distribution_title, "Custom distribution");
     map.set(RStr.AppSourcesForm_sources_count_title, "Sources count");
-    map.set(RStr.AppSourcesForm_some_description_to_specify_what_we_can_do_here_or_not, "Configure what is allowed here"); // TODO
     map.set(RStr.AppSourcesForm_custom_distribution_enabled, "Custom distribution is enabled");
     map.set(RStr.AppSourcesForm_custom_distribution_disabled, "Custom distribution is disabled");
     map.set(RStr.AppSourcesForm_source_url_label, "Source URL");
@@ -344,7 +343,7 @@ export function prepare_en_locale(): Map<StrToken, string> {
     map.set(RStr.DevAppsListScreen_title, "Assets");
     map.set(RStr.DevAppsListScreen_description, "Choose application to manage or create new");
     map.set(RStr.DevAppsListScreen_applications_title, "Applications");
-    map.set(RStr.DevAppsListScreen_applications_description, "Here some information about"); // TODO
+    map.set(RStr.DevAppsListScreen_applications_description, "All applications under your publisher account. Select one to manage or create a new app.");
     map.set(RStr.DevAppsListScreen_columns_name, "Name");
     map.set(RStr.DevAppsListScreen_columns_package, "Package");
     map.set(RStr.DevAppsListScreen_columns_address, "Address");
