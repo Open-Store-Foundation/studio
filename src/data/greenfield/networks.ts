@@ -1,3 +1,4 @@
+import {appConfig} from "@config";
 
 export class GreenNetwork {
     rpc: string;
@@ -11,7 +12,7 @@ export class GreenNetwork {
     }
 
     static Testnet = new GreenNetwork(
-        "https://gnfd-testnet-fullnode-tendermint-us.bnbchain.org:443",
+        appConfig.grfdNodeUrl,
         "5600",
         "https://unpkg.com/@bnb-chain/greenfield-zk-crypto@0.0.3/dist/node/zk-crypto.wasm"
     )

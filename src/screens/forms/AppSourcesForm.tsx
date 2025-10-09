@@ -338,7 +338,7 @@ function AppSourcesTypeTitle() {
                 {str(RStr.AppSourcesForm_settings_title)}
             </Typography>
             <Typography variant="subtitle2" color="text.secondary" fontWeight="bold">
-                {str(RStr.AppSourcesForm_some_description_to_specify_what_we_can_do_here_or_not)}
+                {str(RStr.AppSourcesForm_settings_description)}
             </Typography>
         </Stack>
     )
@@ -352,7 +352,7 @@ function AppSourcesUrlsTitle() {
                 {str(RStr.AppSourcesForm_sources_title)}
             </Typography>
             <Typography variant="subtitle2" color="text.secondary" fontWeight="bold">
-                {str(RStr.AppSourcesForm_some_description_to_specify_what_we_can_do_here_or_not)}
+                {str(RStr.AppSourcesForm_sources_description)}
             </Typography>
         </Stack>
     )
