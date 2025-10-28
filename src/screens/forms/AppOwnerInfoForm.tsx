@@ -14,14 +14,17 @@ import {RStr} from "@localization/ids.ts";
 import {str} from "@localization/res.ts";
 import {useMemo} from "react";
 import {appConfig} from "@config";
+import {IconEye} from "@tabler/icons-react";
 
 export function parseProofs(certs: AppCertificateProof[]) {
     const proofs = certs.map((_, i) => {
         const fingerprintEl = document.getElementById(`fingerprint-${i}`) as HTMLInputElement;
+        const certEl = document.getElementById(`cert-${i}`) as HTMLInputElement;
         const proofEl = document.getElementById(`proof-${i}`) as HTMLInputElement;
         return AppCertificateProofFactory.defaultProof(
             fingerprintEl.value,
-            proofEl.value
+            certEl.value,
+            proofEl.value,
         )
     })
 
@@ -87,7 +90,10 @@ export interface AppOwnerInfoReadOnlyFormProps {
     domain: string
     certs: AppCertificateProof[]
     isSynced: boolean | null
+    isRevealed: boolean | null
     editHref?: string;
+    onReveal?: () => void;
+    revealLoading?: boolean;
 }
 
 export function AppOwnerInfoReadOnlyForm(
@@ -95,14 +101,23 @@ export function AppOwnerInfoReadOnlyForm(
         domain,
         certs,
         isSynced,
+        isRevealed,
         editHref,
+        onReveal,
+        revealLoading,
     }: AppOwnerInfoReadOnlyFormProps
 ) {
     return (
         <AvoirSectionTitledBox
             title={str(RStr.AppOwnerInfoForm_title)}
             description={str(RStr.AppOwnerInfoForm_description)}
-            action={() => editHref ? RenderEditButton(editHref) : undefined}>
+            action={() => {
+                return (
+                    <Stack direction={"row"} spacing={2} alignItems={"center"}>
+                        {editHref ? RenderEditButton(editHref) : undefined}
+                    </Stack>
+                )
+            }}>
 
             <OwnerRequirementAlert isSynced={isSynced}/>
 
@@ -133,15 +148,50 @@ export function AppOwnerInfoReadOnlyForm(
                                 action={FieldAction.Copy}
                             />
 
-                            <AvoirTitledRoFiled
-                                label={``}
-                                action={FieldAction.Copy}
-                                value={cert.proof || str(RStr.AppOwnerInfoForm_no_proof)}
-                                helperText={str(RStr.AppOwnerInfoForm_certificate_proof_helper)}
-                            />
+                            
+
+                            {isRevealed && (
+                                <AvoirTitledRoFiled
+                                    label={``}
+                                    action={FieldAction.Copy}
+                                    value={cert.cert || str(RStr.AppOwnerInfoForm_no_cert)}
+                                    helperText={str(RStr.AppOwnerInfoForm_certificate_cert_helper)}
+                                />
+                            )}
+
+                            {isRevealed && (
+                                <AvoirTitledRoFiled
+                                    label={``}
+                                    action={FieldAction.Copy}
+                                    value={cert.proof || str(RStr.AppOwnerInfoForm_no_proof)}
+                                    helperText={str(RStr.AppOwnerInfoForm_certificate_proof_helper)}
+                                />
+                            )}
                         </Stack>
                     )
                 })
+            }
+
+            {
+                !isRevealed && (
+                    <AvoirPropertyBox type={"default"} background={"background.surfaceVariant"}>
+                        <Stack spacing={1} alignItems={"center"} pt={1}>
+                            <Typography variant="body2" color="text.secondary" textAlign={"center"}>
+                                {str(RStr.AppOwnerInfoForm_reveal_title)}
+                            </Typography>
+
+                            {onReveal && (
+                                <AvoirSecondaryButton
+                                    text={str(RStr.AppOwnerInfoForm_reveal_certs)}
+                                    color={"primary"}
+                                    icon={() => <IconEye/>}
+                                    onClick={onReveal}
+                                    disabled={revealLoading}
+                                />
+                            )}
+                        </Stack>
+                    </AvoirPropertyBox>
+                )
             }
         </AvoirSectionTitledBox>
     )
@@ -221,6 +271,13 @@ export function AppOwnerInfoEditForm(
                                 }}
                                 disabled={isDeleted}
                                 actionDisabled={isActionDisabled}
+                            />
+
+                            <AvoirTitledRoFiled
+                                label={``}
+                                value={cert.cert || str(RStr.AppOwnerInfoForm_no_cert)}
+                                helperText={str(RStr.AppOwnerInfoForm_certificate_cert_helper)}
+                                disabled={isDeleted}
                             />
 
                             <AvoirTitledRoFiled
@@ -374,6 +431,20 @@ export function CertificateProofTextField({index, isLoading, cert, onDeleteCerti
             />
 
             <AvoirCountedTextField
+                helperText={hasDescription ? str(RStr.AppOwnerInfoForm_certificate_cert_helper) : ""}
+                disabled={isLoading}
+                maxLength={3072}
+                autocomplete={"off"}
+                placeholder={str(RStr.AppOwnerInfoForm_cert_placeholder)}
+                id={`cert-${index}`}
+                name="Certificate 1"
+                defaultValue={cert.cert || ""}
+                maxRows={5}
+                multiline
+                grow
+            />
+
+            <AvoirCountedTextField
                 helperText={hasDescription ? str(RStr.AppOwnerInfoForm_certificate_proof_helper) : ""}
                 disabled={isLoading}
                 maxLength={1024}
@@ -392,7 +463,7 @@ export function CertificateProofTextField({index, isLoading, cert, onDeleteCerti
 
 export function CertificateProofInstruction({appAddress}: { appAddress: Address }) {
     const caseAddress = useMemo(() => {
-        return `0x${appAddress.slice(2).toUpperCase()}`
+        return `0x${appAddress.slice(2).toLowerCase()}`
     }, [appAddress])
 
     return (
@@ -435,8 +506,8 @@ export function CertificateProofInstruction({appAddress}: { appAddress: Address 
                         mb: 1
                     }}
                 >
-                    python3 proof_gen.py -jks-path=path/to/keystore.jks -alias=your_alias
-                    -address={caseAddress}
+                    python3 proof_gen.py -jks-path=path/to/keystore.jks -alias=YOUR_ALIAS
+                    -address={caseAddress} -network={appConfig.chainName}
                 </Typography>
             </Stack>
         </AvoirPropertyBox>

@@ -1,10 +1,32 @@
-export const AssetlinksOracleAbi = [
+export const OpenStoreV0Abi = [
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "_verificationAmount",
-        "type": "uint256"
+        "internalType": "address",
+        "name": "_owner",
+        "type": "address"
+      },
+      {
+        "components": [
+          {
+            "internalType": "bool",
+            "name": "isRequestsSuspended",
+            "type": "bool"
+          },
+          {
+            "internalType": "address",
+            "name": "oracle",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "requestHandler",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct OpenStoreConfigV0",
+        "name": "_config",
+        "type": "tuple"
       }
     ],
     "stateMutability": "nonpayable",
@@ -13,12 +35,17 @@ export const AssetlinksOracleAbi = [
   {
     "inputs": [
       {
-        "internalType": "uint32",
-        "name": "code",
-        "type": "uint32"
+        "internalType": "address",
+        "name": "target",
+        "type": "address"
       }
     ],
-    "name": "AssetlinksOracleError",
+    "name": "AddressEmptyCode",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "FailedCall",
     "type": "error"
   },
   {
@@ -30,6 +57,17 @@ export const AssetlinksOracleAbi = [
       }
     ],
     "name": "MulticallUnauthorizedAccount",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint16",
+        "name": "code",
+        "type": "uint16"
+      }
+    ],
+    "name": "OpenStoreError",
     "type": "error"
   },
   {
@@ -56,52 +94,39 @@ export const AssetlinksOracleAbi = [
   },
   {
     "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "app",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "version",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "requestId",
-        "type": "uint256"
-      }
-    ],
-    "name": "EnqueueVerification",
+    "inputs": [],
+    "name": "ConfigChanged",
     "type": "event"
   },
   {
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "address",
-        "name": "app",
+        "name": "target",
         "type": "address"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "version",
+        "name": "requestId",
         "type": "uint256"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "status",
+        "name": "reqType",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "data",
+        "type": "bytes"
       }
     ],
-    "name": "FinalizeVerification",
+    "name": "NewRequest",
     "type": "event"
   },
   {
@@ -153,142 +178,68 @@ export const AssetlinksOracleAbi = [
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "reqType",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "target",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes",
+        "name": "data",
+        "type": "bytes"
+      }
+    ],
+    "name": "addValidationRequest",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "sender",
         "type": "address"
       },
       {
-        "internalType": "address",
-        "name": "obj",
-        "type": "address"
-      }
-    ],
-    "name": "enqueue",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "obj",
-        "type": "address"
-      }
-    ],
-    "name": "enqueue",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "uint256",
-        "name": "requestId",
+        "name": "reqType",
         "type": "uint256"
       },
-      {
-        "internalType": "uint256",
-        "name": "status",
-        "type": "uint256"
-      }
-    ],
-    "name": "finish",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "obj",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "version",
-        "type": "uint256"
-      }
-    ],
-    "name": "getAssetStatus",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getContractState",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "obj",
-        "type": "address"
-      }
-    ],
-    "name": "getLastAssetState",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
       {
         "internalType": "address",
         "name": "target",
         "type": "address"
+      },
+      {
+        "internalType": "bytes",
+        "name": "data",
+        "type": "bytes"
       }
     ],
-    "name": "getLastVerifiedAssetVersion",
+    "name": "addValidationRequest",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "asset",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "channel",
+        "type": "uint256"
+      }
+    ],
+    "name": "getLastAppVersion",
     "outputs": [
       {
         "internalType": "uint256",
@@ -300,8 +251,48 @@ export const AssetlinksOracleAbi = [
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "getVerificationAmount",
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "asset",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "channel",
+        "type": "uint256"
+      }
+    ],
+    "name": "getLastAppVersionAndOwnership",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "asset",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "buildId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getLastOwnershipVersion",
     "outputs": [
       {
         "internalType": "uint256",
@@ -335,53 +326,21 @@ export const AssetlinksOracleAbi = [
     "inputs": [
       {
         "internalType": "address",
-        "name": "",
+        "name": "target",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "versionCode",
         "type": "uint256"
       }
     ],
-    "name": "lastSuccessAt",
+    "name": "isOwnershipVersionActual",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "bool",
         "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "lastVerifiedRequestId",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "lastVersions",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -402,7 +361,7 @@ export const AssetlinksOracleAbi = [
   },
   {
     "inputs": [],
-    "name": "nextQueueRequestId",
+    "name": "nextRequestIdToCreate",
     "outputs": [
       {
         "internalType": "uint256",
@@ -434,55 +393,12 @@ export const AssetlinksOracleAbi = [
         "type": "address"
       }
     ],
-    "name": "pendingVersions",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
     "name": "plugins",
     "outputs": [
       {
         "internalType": "bool",
         "name": "",
         "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "queue",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "target",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "version",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -533,38 +449,19 @@ export const AssetlinksOracleAbi = [
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "_verificationAmount",
-        "type": "uint256"
-      }
-    ],
-    "name": "setVerificationAmount",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
-        "name": "",
+        "name": "asset",
         "type": "address"
       },
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
+        "internalType": "bool",
+        "name": "isVisible",
+        "type": "bool"
       }
     ],
-    "name": "states",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
+    "name": "setAssetVisibility",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

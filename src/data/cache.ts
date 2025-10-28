@@ -76,6 +76,18 @@ export const CacheKeys = {
         },
         ttl: 1000 * 60 * 10,
     },
+    AppOwnerProofs: {
+        key: (appAddress: string) => {
+            return `APP_OWNER_PROOFS_${appAddress}`
+        },
+        ttl: 1000 * 60 * 10,
+    },
+    AppOwnerState: {
+        key: (appAddress: string) => {
+            return `APP_OWNER_STATE_${appAddress}`
+        },
+        ttl: 1000 * 60 * 10,
+    },
 }
 
 

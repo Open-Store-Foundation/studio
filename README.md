@@ -24,6 +24,16 @@ yarn preview
 - **lint**: `eslint .`
 - **generate-proto**: `node scripts/generate-ts-proto.js`
 
+## .env
+``` bash
+VITE_ETH_NODE=http://127.0.0.1:8545 # hardhat
+VITE_GREENFIELD_NODE=https://gnfd-testnet-fullnode-tendermint-ap.bnbchain.org # GF testnet node
+VITE_GRAPH_NODE=http://127.0.0.1:3001 # contracts -> graph.tx
+VITE_CHAIN_NAME=lh # lh | bsc | bsctest 
+VITE_CLIENT_API_URL=http://127.0.0.1:8081 | node -> client -> api
+VITE_WAGMI_PROJECT_ID=
+```
+
 ## Tech
 
 - **Framework**: React + Vite

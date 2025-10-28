@@ -10,7 +10,7 @@ interface GraphApp {
     name: string,
 }
 
-export class GraphApiClient {
+export class GraphRepo {
     private http: AxiosInstance;
 
     constructor(nodeUrl: string) {
@@ -25,8 +25,8 @@ export class GraphApiClient {
         return response.data.accounts;
     }
 
-    async getApps(devAddress: Address): Promise<ScApp[]> {
-        const response = await this.http.get(`/apps/${devAddress}`);
+    async getApps(publisherAddress: Address): Promise<ScApp[]> {
+        const response = await this.http.get(`/apps/${publisherAddress}`);
         const apps = response.data.apps.map((app: GraphApp, id: number) => {
             const data = {
                 id: id,

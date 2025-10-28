@@ -69,6 +69,6 @@ export const hardhat = /*#__PURE__*/ defineChain({
         symbol: 'BNB',
     },
     rpcUrls: {
-        default: { http: ['http://127.0.0.1:8545'] },
+        default: { http: [import.meta.env.VITE_ETH_NODE!!] },
     },
 })

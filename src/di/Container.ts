@@ -8,7 +8,7 @@ import {TimedCache} from "@utils/cache.ts";
 import {PublishingRepo} from "@data/client/PublishingRepo.ts";
 import {ApkValidator, PngLogoValidator} from "@utils/validators.ts";
 import {GreenfieldHttpClient} from "@data/greenfield/GreenfieldHttpClient.ts";
-import { GraphApiClient } from "@data/graph/GraphApiClient.ts";
+import { GraphRepo } from "@data/graph/GraphRepo.ts";
 import {appConfig} from "@config";
 
 class DI {
@@ -21,7 +21,7 @@ class DI {
     Cache: TimedCache = TimedCache.create()
     Gecko: CoinGeckoClient = new CoinGeckoClient(this.Cache)
 
-    Graph = new GraphApiClient(appConfig.graphNodeUrl);
+    Graph = new GraphRepo(appConfig.graphNodeUrl);
     GasProvider: GasProvider = new GasProvider(this.Wallet, this.Cache)
     GreenfieldHttpClient: GreenfieldHttpClient = new GreenfieldHttpClient(GreenNetwork.Testnet.rpc)
     Greenfield: GreenfieldClient = new GreenfieldClient(GreenNetwork.Testnet, this.GreenfieldHttpClient, this.GasProvider, this.Cache)

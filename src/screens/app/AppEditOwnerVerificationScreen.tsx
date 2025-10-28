@@ -297,17 +297,21 @@ export function AppEditOwnerVerificationScreen() {
 
         try {
             setOwnerState(S.loading())
-            const state = await ScAssetService.getOwnerState(appAddress)
-            const proofs = state.fingerprints.map((fingerprint, i) =>
-                AppCertificateProofFactory.defaultProof(fingerprint, state.proofs[i])
+            const {owner, proof} = await ScAssetService.getOwnerStateWithProofs(appAddress)
+            const proofs = owner.fingerprints.map((fingerprint, i) =>
+                AppCertificateProofFactory.defaultProof(
+                    fingerprint,
+                    proof.certs?.[i] || "",
+                    proof.proofs?.[i] || ""
+                )
             )
 
             const info = {
-                domain: state.domain,
+                domain: owner.domain,
                 proofs: proofs
             } as AppOwnerInfo
 
-            setDomain(state.domain)
+            setDomain(owner.domain)
             setOwnerState(S.data(info))
 
             if (proofs.length == 0) {

@@ -1,9 +1,9 @@
 import {useCache, useGraph, useGasProvider, useWallet} from "@di";
-import {PluginMulticallAbi} from "@data/sc/abi/PluginMulticall.ts";
 import {appConfig} from "@config";
 import {Address} from "@data/CommonModels.ts";
 import {BytesLike} from "ethers";
 import { InsufficientFundsError } from "viem";
+import {TrustedMulticallAbi} from "@data/sc/abi/TrustedMulticall.ts";
 
 export interface ScMulticallData {
     manager: Address,
@@ -57,7 +57,7 @@ export abstract class ScBaseService {
         value: bigint,
     ) {
         return {
-            abi: PluginMulticallAbi,
+            abi: TrustedMulticallAbi,
             address: appConfig.contracts.multicall,
             functionName: "multicall",
             args: [calldata],

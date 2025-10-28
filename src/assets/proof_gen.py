@@ -6,14 +6,10 @@ import subprocess
 import sys
 import os
 import tempfile
-import base64 # Still imported but urlsafe_b64encode won't be used for proof
 import re
 import getpass
 
-# --- Global Debug Setting ---
 DEBUG_MODE = False
-
-# --- Utilities ---
 
 def debug_print(*args, **kwargs):
     if DEBUG_MODE:
@@ -25,7 +21,6 @@ def error_print(*args, **kwargs):
 def run_command(command, input_data=None, capture_output=True, check=True, shell=False, env=None, working_dir=None, is_binary_output=False):
     try:
         command_str = [str(item) for item in command]
-        # In debug mode, we print the command but censor passwords for security
         if DEBUG_MODE:
             debug_print(f"Executing: {' '.join(command_str)}")
         else:
@@ -95,8 +90,6 @@ def check_tool_availability(tool_name, check_args):
     debug_print(f"'{tool_name}' found.")
     return True
 
-# --- Core Logic ---
-
 def calculate_sha256_fingerprint_with_keytool(jks_path, jks_pass, alias):
     debug_print(f"\n--- Calculating SHA256 fingerprint for alias '{alias}' using keytool -list -v ---")
     keytool_command_list = [
@@ -128,28 +121,65 @@ def calculate_sha256_fingerprint_with_keytool(jks_path, jks_pass, alias):
             error_print(f"Full keytool output was:\n{output_text}")
         return None
 
-def sign_with_external_tools(jks_path, jks_pass, alias, alias_pass, app_hex):
-    """
-    Calculates cert fingerprint, signs data, and returns (fingerprint, proof_hex) or None.
-    """
+def export_certificate_der_hex(jks_path, jks_pass, alias):
+    der_file_path = None
+    try:
+        fd, der_temp_path = tempfile.mkstemp(suffix=".cer", prefix="temp_cert_der_", dir='.')
+        os.close(fd)
+        os.remove(der_temp_path)
+        der_file_path = os.path.abspath(der_temp_path)
+
+        keytool_export_cmd = [
+            'keytool', '-exportcert',
+            '-keystore', jks_path,
+            '-storepass', jks_pass,
+            '-alias', alias,
+            '-file', der_file_path
+        ]
+        process_export = run_command(keytool_export_cmd)
+        if not process_export:
+            return None
+        if not os.path.exists(der_file_path) or os.path.getsize(der_file_path) == 0:
+            error_print(f"keytool -exportcert seemingly succeeded but DER file '{der_file_path}' is missing or empty.")
+            return None
+        with open(der_file_path, 'rb') as f:
+            der_bytes = f.read()
+        return der_bytes.hex()
+    finally:
+        if der_file_path and os.path.exists(der_file_path):
+            try:
+                os.remove(der_file_path)
+            except OSError:
+                pass
+
+def map_network(network_key):
+    mapping = {
+        'bscmain': 'eip155:56',
+        'bsctest': 'eip155:97',
+        'lh': 'eip155:31337',
+    }
+    if network_key not in mapping:
+        raise ValueError("Unsupported network")
+    return mapping[network_key]
+
+def sign_with_external_tools(jks_path, jks_pass, alias, alias_pass, app_hex, network_key):
     if not os.path.exists(jks_path):
         error_print(f"JKS file not found at path '{jks_path}'")
         return None
 
-    # --- Calculate SHA256 Fingerprint of the certificate ---
     calculated_sha_finger = calculate_sha256_fingerprint_with_keytool(jks_path, jks_pass, alias)
     if not calculated_sha_finger:
-        return None # Error already printed
+        return None
 
-    data_to_sign_str = f"{app_hex}::{calculated_sha_finger}"
+    caip2 = map_network(network_key)
+    data_to_sign_str = f"{caip2}::{app_hex}::{calculated_sha_finger}"
     data_to_sign_bytes = data_to_sign_str.encode('utf-8')
-    debug_print(f"\nData to sign (with calculated fingerprint): '{data_to_sign_str}'")
+    debug_print(f"Data to sign: '{data_to_sign_str}'")
 
     pkcs12_file_path = None
     pem_file_path = None
 
     try:
-        debug_print(f"Generating temporary file paths in current directory ('.')...")
         try:
             fd, pkcs12_temp_path = tempfile.mkstemp(suffix=".p12", prefix="temp_pkcs12_", dir='.')
             os.close(fd)
@@ -163,11 +193,8 @@ def sign_with_external_tools(jks_path, jks_pass, alias, alias_pass, app_hex):
             if pkcs12_file_path and os.path.exists(pkcs12_file_path): os.remove(pkcs12_file_path)
             if pem_file_path and os.path.exists(pem_file_path): os.remove(pem_file_path)
             return None
-        debug_print(f"Temporary file paths:\n  PKCS12: {pkcs12_file_path}\n  PEM Key: {pem_file_path}")
 
-        # --- Step 1: Convert JKS -> PKCS12 ---
         pkcs12_pass = jks_pass
-        debug_print(f"\n--- Step 1: Converting JKS (alias: '{alias}') to PKCS12 using keytool ---")
         keytool_command_export = [
             'keytool', '-importkeystore',
             '-srcstoretype', "JKS",
@@ -181,15 +208,11 @@ def sign_with_external_tools(jks_path, jks_pass, alias, alias_pass, app_hex):
         ]
         process_export = run_command(keytool_command_export)
         if not process_export:
-            debug_print("keytool command failed during PKCS12 export.")
             return None
         if not os.path.exists(pkcs12_file_path) or os.path.getsize(pkcs12_file_path) == 0:
             error_print(f"keytool command seemingly succeeded but PKCS12 file '{pkcs12_file_path}' is missing or empty!")
             return None
-        debug_print("--- Conversion to PKCS12 completed successfully ---")
 
-        # --- Step 2: Extract PEM private key from PKCS12 ---
-        debug_print(f"\n--- Step 2: Extracting private key from PKCS12 ('{os.path.basename(pkcs12_file_path)}') to PEM using openssl ---")
         openssl_command_extract = [
             'openssl', 'pkcs12',
             '-in', pkcs12_file_path,
@@ -200,64 +223,50 @@ def sign_with_external_tools(jks_path, jks_pass, alias, alias_pass, app_hex):
         ]
         process_extract = run_command(openssl_command_extract)
         if not process_extract:
-            debug_print("openssl command failed during PEM extraction.")
             return None
         if not os.path.exists(pem_file_path) or os.path.getsize(pem_file_path) == 0:
             error_print(f"openssl command seemingly succeeded but PEM file '{pem_file_path}' is missing or empty.")
             return None
-        debug_print("--- PEM key extraction completed successfully ---")
 
-        # --- Step 3: Sign the data ---
-        debug_print(f"\n--- Step 3: Signing data using openssl dgst -sha256 ---")
         openssl_command_sign = [
             'openssl', 'dgst', '-sha256',
             '-sign', pem_file_path,
         ]
         process_sign = run_command(openssl_command_sign, input_data=data_to_sign_bytes, is_binary_output=True)
         if not process_sign:
-            debug_print("openssl command failed during signing.")
             return None
         signature_bytes = process_sign.stdout
         if not signature_bytes:
             error_print("openssl dgst command finished but returned no signature (empty stdout).")
             return None
-        debug_print("--- Data signing completed successfully ---")
 
-        # --- Step 4: Convert binary signature to HEX ---
         signature_hex_string = signature_bytes.hex()
-        debug_print(f"Raw signature bytes length: {len(signature_bytes)}")
-        debug_print(f"Signature (HEX string): {signature_hex_string}")
 
-        return calculated_sha_finger, signature_hex_string # Return fingerprint and HEX proof
+        cert_der_hex = export_certificate_der_hex(jks_path, jks_pass, alias)
+        if not cert_der_hex:
+            return None
+
+        return calculated_sha_finger, signature_hex_string, cert_der_hex, caip2
 
     finally:
-        debug_print("\n--- Cleaning up temporary files ---")
         files_to_remove = [pkcs12_file_path, pem_file_path]
         for f_path in files_to_remove:
             if f_path and os.path.exists(f_path):
-                abs_f_path = os.path.abspath(f_path)
                 try:
                     os.remove(f_path)
-                    debug_print(f"Removed: {abs_f_path}")
-                except OSError as e:
-                    print(f"Warning: Failed to remove temporary file {abs_f_path}: {e}", file=sys.stderr)
-
-# --- Entry Point ---
+                except OSError:
+                    pass
 
 def main():
     global DEBUG_MODE
 
     parser = argparse.ArgumentParser(
-        description="Calculates the SHA-256 certificate fingerprint and signs '${app}:${calculated-sha-fingerprint}' "
-                    "using a key from a JKS file. Outputs the HEX signature (proof) and the fingerprint. "
-                    "Passwords are read securely from standard input to avoid shell history.",
-        epilog="Workflow: JKS -(keytool for fingerprint)-> SHA256_Fingerprint\n"
-               "          JKS -(keytool)-> PKCS12 -(openssl)-> PEM_PrivateKey -(openssl dgst)-> Signature (HEX).\n"
-               "REQUIREMENTS: 'keytool' (from Java) and 'openssl' installed and in PATH.\n"
+        description="Calculates the SHA-256 certificate fingerprint and signs 'network::chainId::address:finger' using a key from a JKS file. Outputs the HEX signature (proof), the fingerprint, and the certificate DER as hex.",
     )
     parser.add_argument('--debug', action='store_true', help="Enable verbose debug output to stderr.")
     parser.add_argument('-jks-path', required=True, help="Path to the JKS file.")
     parser.add_argument('-alias', required=True, help="Alias (name) of the key entry in JKS.")
+    parser.add_argument('-network', required=True, choices=['bscmain', 'bsctest', 'lh'], help="Network: bscmain, bsctest or lh. Mapped to CAIP-2 (eip155:56 / eip155:97 / eip155:31337).")
 
     def validate_app_hex(value):
         if not isinstance(value, str) or not value.startswith('0x') or len(value) != 42:
@@ -268,8 +277,7 @@ def main():
             raise argparse.ArgumentTypeError("Argument -address must contain valid HEX characters after '0x'.")
         return value
 
-    parser.add_argument('-address', required=True, type=validate_app_hex,
-                        help="Application identifier (e.g., 0x followed by 40 hex characters).")
+    parser.add_argument('-address', required=True, type=validate_app_hex, help="Application identifier (0x followed by 40 hex characters).")
 
     args = parser.parse_args()
 
@@ -292,28 +300,29 @@ def main():
         print("\nPassword entry cancelled.", file=sys.stderr)
         sys.exit(1)
 
-
-    debug_print("--- Checking for required tools ---")
     if not check_tool_availability('keytool', ['-help']):
         sys.exit(1)
     if not check_tool_availability('openssl', ['version']):
         sys.exit(1)
-    debug_print("--- Required tools found ---")
 
     result_tuple = sign_with_external_tools(
         args.jks_path,
         jks_pass,
         args.alias,
         alias_pass,
-        args.address
+        args.address.lower(),
+        args.network
     )
 
     if result_tuple:
-        calculated_fingerprint, proof_hex = result_tuple
-        # Output Proof first, then Fingerprint as requested
+        calculated_fingerprint, proof_hex, cert_der_hex, caip2 = result_tuple
+        print(f"\nNetwork (CAIP-2):")
+        print(caip2)
         print(f"\nFingerprint (SHA-256):")
         print(calculated_fingerprint)
-        print(f"\nProof (HEX):") # Updated label
+        print(f"\nCertificate (DER, HEX):")
+        print(f"0x{cert_der_hex}")
+        print(f"\nProof (HEX):")
         print(f"0x{proof_hex}")
         sys.exit(0)
     else:
@@ -322,3 +331,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+

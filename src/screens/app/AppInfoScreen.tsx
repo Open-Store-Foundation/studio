@@ -17,6 +17,7 @@ import {AndroidTypeId, AppCertificateProofFactory, AppOwnerInfo} from "@data/Com
 import {RStr} from "@localization/ids.ts";
 import {str} from "@localization/res.ts";
 import {LogoDrawerDialog} from "@screens/release/dialogs/LogoDrawerDialog.tsx";
+import {AutoSnackbar, DefaultSnackbarError} from "@components/events/AutoSnackbar.tsx";
 
 export function AppInfoScreen() {
     const navigate = useNavigate();
@@ -30,6 +31,9 @@ export function AppInfoScreen() {
     const [isSynced, setIsSynced] = useState<boolean | null>(null)
     const [isLogoDrawerOpen, setIsLogoDrawerOpen] = useState(false)
     const [logoRefreshKey, setLogoRefreshKey] = useState(0)
+    const [ownerCertsRevealed, setOwnerCertsRevealed] = useState(false)
+    const [revealLoading, setRevealLoading] = useState(false)
+    const [revealError, setRevealError] = useState<string | null>(null)
 
     useAsyncEffect(async () => {
         if (isFetching) {
@@ -72,9 +76,7 @@ export function AppInfoScreen() {
 
             state = {
                 domain: data.domain,
-                proofs: data.fingerprints.map((fingerprint, i) =>
-                    AppCertificateProofFactory.defaultProof(fingerprint, data.proofs[i])
-                ) ?? []
+                proofs: data.fingerprints.map((f) => AppCertificateProofFactory.defaultProof(f)) ?? []
             } as AppOwnerInfo
 
             setState(S.data(state))
@@ -95,6 +97,27 @@ export function AppInfoScreen() {
         }
     }, [isFetching]);
 
+    const handleReveal = async () => {
+        if (!appAddress || revealLoading) {
+            return
+        }
+
+        setRevealLoading(true)
+        try {
+            const { owner, proof } = await ScAssetService.getOwnerStateWithProofs(appAddress)
+            const proofs = owner.fingerprints.map((fingerprint, i) =>
+                AppCertificateProofFactory.defaultProof(fingerprint, proof.certs?.[i] || "", proof.proofs?.[i] || "")
+            )
+            setState(S.data({ domain: owner.domain, proofs }))
+            setOwnerCertsRevealed(true)
+        } catch (e) {
+            console.error(e)
+            setRevealError(DefaultSnackbarError)
+        } finally {
+            setRevealLoading(false)
+        }
+    }
+
     const handleLogoUploadComplete = () => {
         setIsLogoDrawerOpen(false)
         setLogoRefreshKey(prev => prev + 1)
@@ -102,6 +125,8 @@ export function AppInfoScreen() {
 
     return (
         <PageContainer>
+            <AutoSnackbar message={revealError} onClose={() => setRevealError(null)}/>
+
             <AvoirScreenTitle
                 title={str(RStr.AppInfoScreen_title)}
                 description={str(RStr.AppInfoScreen_description)}/>
@@ -155,7 +180,10 @@ export function AppInfoScreen() {
                             certs={data?.proofs ?? []}
                             domain={data?.domain || ""}
                             isSynced={isSynced}
+                            isRevealed={ownerCertsRevealed}
                             editHref={!isFetching ? AppRoute.OwnerValidation.route(devId, appPackage, devAddress, appAddress) : undefined}
+                            onReveal={handleReveal}
+                            revealLoading={revealLoading}
                         />
 
                         <AppSourcesReadOnlyForm

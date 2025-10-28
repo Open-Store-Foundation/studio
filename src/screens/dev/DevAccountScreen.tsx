@@ -11,7 +11,7 @@ import {useGecko, useGreenfield} from "@di";
 import {S, useAsyncEffect, useScreenState} from "@utils/state.ts";
 import {useSafeAccount} from "@hooks/useSafeAccount.ts";
 import {GreenfieldFeeClient} from "@data/greenfield/GreenfieldFeeClient.ts";
-import {isValueLoading} from "@components/anim/AvoirSkeleton.tsx";
+import {hasValueOrLoading} from "@components/anim/AvoirSkeleton.tsx";
 import {formatValueWithUsdOrPlaceholder, TBNB} from "@utils/format.ts";
 import {AppRoute} from "@router";
 import {RStr} from "@localization//ids.ts";
@@ -233,7 +233,7 @@ export function DevAccountScreen() {
                                 infoLink={AppRoute.Article.route(AppRoute.Article.BillingAndFees)}
                             />
                             <AvoirPropertyBox type={"big"}>
-                                {isValueLoading(data?.storeFee, data?.storeFeeIsLoading) && (
+                                {hasValueOrLoading(data?.storeFee, data?.storeFeeIsLoading) && (
                                     <AvoirProperty
                                         title={str(RStr.DevAccountScreen_greenfieldRates_storageRate)}
                                         value={formatValueWithUsdOrPlaceholder(data?.storeFee, data?.usdRate, data?.storeFeeIsLoading, TBNB)}
@@ -241,7 +241,7 @@ export function DevAccountScreen() {
                                     />
                                 )}
 
-                                {isValueLoading(data?.quoteFee, data?.quoteFeeIsLoading) && (
+                                {hasValueOrLoading(data?.quoteFee, data?.quoteFeeIsLoading) && (
                                     <AvoirProperty
                                         title={str(RStr.DevAccountScreen_greenfieldRates_downloadRate)}
                                         value={formatValueWithUsdOrPlaceholder(data?.quoteFee, data?.usdRate, data?.quoteFeeIsLoading, TBNB)}

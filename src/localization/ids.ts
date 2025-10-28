@@ -24,11 +24,14 @@ export class RStr {
 
     static AppOwnerInfoForm_title: StrToken = "AppOwnerInfoForm.title";
     static AppOwnerInfoForm_description: StrToken = "AppOwnerInfoForm.description";
+    static AppOwnerInfoForm_reveal_certs: StrToken = "AppOwnerInfoForm_reveal_certs";
+    static AppOwnerInfoForm_reveal_title: StrToken = "AppOwnerInfoForm.reveal.title";
     static AppOwnerInfoForm_website_label: StrToken = "AppOwnerInfoForm.website.label";
     static AppOwnerInfoForm_website_helper: StrToken = "AppOwnerInfoForm.website.helper";
     static AppOwnerInfoForm_website_error: StrToken = "AppOwnerInfoForm.website.error";
     static AppOwnerInfoForm_certificate_label: StrToken = "AppOwnerInfoForm.certificate.label";
     static AppOwnerInfoForm_certificate_fingerprint_helper: StrToken = "AppOwnerInfoForm.certificate.fingerprint.helper";
+    static AppOwnerInfoForm_certificate_cert_helper: StrToken = "AppOwnerInfoForm.certificate.cert.helper";
     static AppOwnerInfoForm_certificate_proof_helper: StrToken = "AppOwnerInfoForm.certificate.proof.helper";
     static AppOwnerInfoForm_add_certificate: StrToken = "AppOwnerInfoForm.add.certificate";
     static AppOwnerInfoForm_how_to_generate_title: StrToken = "AppOwnerInfoForm.how_to_generate.title";
@@ -38,11 +41,13 @@ export class RStr {
     static AppOwnerInfoForm_how_to_generate_note2: StrToken = "AppOwnerInfoForm.how_to_generate.note2";
     static AppOwnerInfoForm_ownership_alert: StrToken = "AppOwnerInfoForm.ownership.alert";
     static AppOwnerInfoForm_no_fingerprint: StrToken = "AppOwnerInfoForm.no.fingerprint";
+    static AppOwnerInfoForm_no_cert: StrToken = "AppOwnerInfoForm.no.cert";
     static AppOwnerInfoForm_no_proof: StrToken = "AppOwnerInfoForm.no.proof";
     static AppOwnerInfoForm_this_link: StrToken = "AppOwnerInfoForm.this_link";
     static AppOwnerInfoForm_your_address: StrToken = "AppOwnerInfoForm.your_address";
     static AppOwnerInfoForm_fingerprint_placeholder: StrToken = "AppOwnerInfoForm.fingerprint_placeholder";
     static AppOwnerInfoForm_proof_placeholder: StrToken = "AppOwnerInfoForm.proof_placeholder";
+    static AppOwnerInfoForm_cert_placeholder: StrToken = "AppOwnerInfoForm.cert_placeholder";
 
     static AppGeneralInfoForm_title: StrToken = "AppGeneralInfoForm.title";
     static AppGeneralInfoForm_description: StrToken = "AppGeneralInfoForm.description";
@@ -215,6 +220,7 @@ export class RStr {
     static AppStatusScreen_oracle_contentReadingError_desc: StrToken = "AppStatusScreen.oracle.contentReadingError.desc";
     static AppStatusScreen_oracleType_ownership: StrToken = "AppStatusScreen.oracleType.ownership";
     static AppStatusScreen_oracleType_ownershipReview: StrToken = "AppStatusScreen.oracleType.ownershipReview";
+    static AppStatusScreen_oracleType_ownershipProof: StrToken = "AppStatusScreen.oracleType.ownershipProof";
     static AppStatusScreen_build_verified: StrToken = "AppStatusScreen.build.verified";
     static AppStatusScreen_build_error: StrToken = "AppStatusScreen.build.error";
     static AppStatusScreen_build_unknown: StrToken = "AppStatusScreen.build.unknown";
@@ -239,6 +245,7 @@ export class RStr {
     static AppStatusScreen_build_digestAlgoMissing: StrToken = "AppStatusScreen.build.digestAlgoMissing";
     static AppStatusScreen_build_hashMismatch: StrToken = "AppStatusScreen.build.hashMismatch";
     static AppStatusScreen_build_incorrectCertFormat: StrToken = "AppStatusScreen.build.incorrectCertFormat";
+    static AppStatusScreen_build_invalidProof: StrToken = "AppStatusScreen.build.invalidProof";
     static AppStatusScreen_build_unknownStatus: StrToken = "AppStatusScreen.build.unknownStatus";
 
     static AppBuildsScreen_title: StrToken = "AppBuildsScreen.title";

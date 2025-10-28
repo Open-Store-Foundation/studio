@@ -11,7 +11,7 @@ export interface ScAppSyncState {
     id: number,
     type: ScOracleType,
     version: number,
-    status?: ScOwnershipVerificationStatus,
+    status?: number,
 }
 
 export interface ScAppSyncData {
@@ -36,6 +36,21 @@ export enum ScOwnershipVerificationStatus {
 export enum ScOracleType {
     Ownership = 0,
     OwnershipReview = 1,
+    CertificateProofs = 2,
+}
+
+export class ScOracleFactory {
+    static ownership(version: number, status?: number): ScAppSyncState {
+        return { id: ScOracleType.Ownership, type: ScOracleType.Ownership, version, status }
+    }
+
+    static ownershipReview(version: number): ScAppSyncState {
+        return { id: ScOracleType.OwnershipReview, type: ScOracleType.OwnershipReview, version, status: undefined }
+    }
+
+    static ownershipProof(version: number, status?: number): ScAppSyncState {
+        return { id: ScOracleType.CertificateProofs, type: ScOracleType.CertificateProofs, version, status }
+    }
 }
 
 export class ScOracleService extends ScBaseService {
@@ -140,30 +155,16 @@ export class ScOracleService extends ScBaseService {
         return data
     }
 
-    static async getLastStates(appAddress: Address)  {
+    static async getLastStates(appAddress: Address) {
         const state = await this.getLastState(appAddress)
 
         let statuses: ScAppSyncState[] = [];
 
-        if (state.pendingVersion > 0n) {
-            statuses.push(
-                {
-                    id: 0,
-                    type: ScOracleType.OwnershipReview,
-                    version: state.pendingVersion,
-                    status: undefined,
-                }
-            )
+        if (state.pendingVersion > 0) {
+            statuses.push(ScOracleFactory.ownershipReview(state.pendingVersion))
         }
 
-        statuses.push(
-            {
-                id: 1,
-                type: ScOracleType.Ownership,
-                version: state.version,
-                status: state.status,
-            }
-        )
+        statuses.push(ScOracleFactory.ownership(state.version, state.status))
 
         return statuses;
     }
@@ -181,7 +182,7 @@ export class ScOracleService extends ScBaseService {
                 let data = await this.reader.readContract({
                     abi: AssetlinksOracleAbi,
                     address: appConfig.contracts.oracle,
-                    functionName: "getLastAssetStatus",
+                    functionName: "getLastAssetState",
                     args: [appAddress],
                 })
                 return this.parseVerification(data)

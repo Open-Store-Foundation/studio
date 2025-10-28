@@ -38,7 +38,7 @@ const contracts = {
 const price = {
     lh: {
         oracleAssetlink: parseEther("0.005"),
-        validatorBuild: parseEther("0.1"),
+        validatorBuild: parseEther("0"),
     },
     bsctest: {
         oracleAssetlink: parseEther("0.001"),
@@ -71,16 +71,43 @@ const confirmations = {
     bsctest: 10,
 }
 
+function grfdNodeUrl() {
+    return import.meta.env.VITE_GREENFIELD_NODE!!
+}
+
+function graphNodeUrl() {
+    return import.meta.env.VITE_GRAPH_NODE!!
+}
+
+function projectId() {
+    return import.meta.env.VITE_WAGMI_PROJECT_ID!!
+}
+
+function chainProfile(): ChainEnv {
+    return import.meta.env.VITE_CHAIN_NAME as ChainEnv || "bsctest"
+}
+
+function apiClientUrl() {
+    return import.meta.env.VITE_CLIENT_API_URL || "http://localhost:8081";
+}
+
+function gfAuthTtl() {
+    return Number(import.meta.env.VITE_GREENFEILD_AUTH_TL) || 7 * 24 * 60 * 60 * 1000;
+}
+
 type ChainEnv = "lh" | "bsctest";
 const chainEnv: ChainEnv = chainProfile()
 
 export const appConfig = {
     // @ts-ignore
     isLocalhost: chainEnv === "lh",
-    baseClientUrl: apiClientUrl(),
+    chainName: chainEnv,
     // TODO maybe I should upload it somewhere
     // TODO from the other side the target user is a dev so it's possible to see actual version with history
     proofGenLUrl: "https://github.com/Open-Store-Foundation/studio/blob/main/src/assets/proof_gen.py",
+
+    clientApiVersion: 1,
+    baseClientUrl: apiClientUrl(),
 
     contracts: contracts[chainEnv]!!,
     prices: price[chainEnv]!!,
@@ -121,6 +148,7 @@ export const appConfig = {
     defaultBucketPlaceholder: "bucket-placeholder",
     defaultBucketTopUp: 0.01,
     defaultGlobalFamilyGroup: 1,
+    protocolVersion: 0,
 
     maxDevNameLength: 50,
     maxOwnerCerts: 10,
@@ -129,26 +157,6 @@ export const appConfig = {
     buildQuoteMultiplayer: 10,
 }
 
-function grfdNodeUrl() {
-    return import.meta.env.VITE_GREENFIELD_NODE!!
-}
-
-function graphNodeUrl() {
-    return import.meta.env.VITE_GRAPH_NODE!!
-}
-
-function projectId() {
-    return import.meta.env.VITE_WAGMI_PROJECT_ID!!
-}
-
-function chainProfile(): ChainEnv {
-    return import.meta.env.VITE_CHAIN_NAME as ChainEnv || "bsctest"
-}
-
-function apiClientUrl() {
-    return import.meta.env.VITE_CLIENT_API_URL || "http://localhost:8081";
-}
-
-function gfAuthTtl() {
-    return Number(import.meta.env.VITE_GREENFEILD_AUTH_TL) || 7 * 24 * 60 * 60 * 1000;
+export function isProtocolZero() {
+    return appConfig.protocolVersion === 0;
 }

@@ -10,7 +10,7 @@ import {
     formatValueWithUsdOrPlaceholder,
     TBNB
 } from "@utils/format";
-import {AvoirSkeleton, isValueLoading} from "@components/anim/AvoirSkeleton.tsx";
+import {AvoirSkeleton, hasValueOrLoading} from "@components/anim/AvoirSkeleton.tsx";
 import {IconArrowDownLeft, IconSettings} from "@tabler/icons-react";
 import {str} from "@localization/res.ts";
 import {RStr} from "@localization/ids.ts";
@@ -65,7 +65,7 @@ export function BalanceInfoFrom({
                 <AvoirPropertyTitle title={str(RStr.BalanceInfoForm_title)}/>
 
                 <Stack pb={1} direction="row" spacing={1}>
-                    {isValueLoading(balance, balanceIsLoading) && (
+                    {hasValueOrLoading(balance, balanceIsLoading) && (
                         <AvoirSkeleton isLoading={balanceIsLoading}>
                             <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
                                 {formatValueOrPlaceholder(balance, balanceIsLoading, TBNB, 6)}
@@ -110,14 +110,14 @@ export function BalanceInfoFrom({
                 <Stack spacing={3} pt={1} >
                     <Stack spacing={1}>
                         <AvoirPropertyTitle title={str(RStr.BalanceInfoForm_fees)}/>
-                        {isValueLoading(prepaidFee, prepaidFeeIsLoading) && (
+                        {hasValueOrLoading(prepaidFee, prepaidFeeIsLoading) && (
                             <AvoirProperty
                                 title={str(RStr.BalanceInfoForm_prepaidAmount)}
                                 value={formatValueWithUsdOrPlaceholder(prepaidFee, usdRate, prepaidFeeIsLoading, TBNB)}
                                 isLoading={prepaidFeeIsLoading}
                             />
                         )}
-                        {isValueLoading(flowRate, flowRateIsLoading) && (
+                        {hasValueOrLoading(flowRate, flowRateIsLoading) && (
                             <AvoirProperty
                                 title={str(RStr.BalanceInfoForm_monthlyAmount)}
                                 value={formatValueWithUsdOrPlaceholder(flowRate, usdRate, flowRateIsLoading, TBNB)}
@@ -129,7 +129,7 @@ export function BalanceInfoFrom({
 
                     <Stack spacing={1}>
                         <AvoirPropertyTitle title={str(RStr.BalanceInfoForm_data)}/>
-                        {isValueLoading(totalSize, totalSizeIsLoading) && (
+                        {hasValueOrLoading(totalSize, totalSizeIsLoading) && (
                             <AvoirProperty
                                 title={str(RStr.BalanceInfoForm_total)}
                                 value={formatSizeOrPlaceholder(totalSize, totalSizeIsLoading)}
@@ -160,7 +160,7 @@ export function BalanceInfoFrom({
                                 />
                             }
 
-                            {isValueLoading(quoteAvailable, quoteAvailableIsLoading) && (
+                            {hasValueOrLoading(quoteAvailable, quoteAvailableIsLoading) && (
                                 <AvoirProperty
                                     title={str(RStr.BalanceInfoForm_trafficAvailable)}
                                     value={formatTextOrLoading(quoteAvailable)}
