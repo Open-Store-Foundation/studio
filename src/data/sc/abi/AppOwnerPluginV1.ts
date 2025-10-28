@@ -29,8 +29,106 @@ export const AppOwnerPluginV1Abi = [
         "type": "address"
       }
     ],
+    "name": "OwnableDelegateUnauthorizedAccount",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableInvalidOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
     "name": "OwnableUnauthorizedAccount",
     "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "version",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes[]",
+        "name": "certs",
+        "type": "bytes[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes[]",
+        "name": "proofs",
+        "type": "bytes[]"
+      }
+    ],
+    "name": "AppOwnerChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_version",
+        "type": "uint256"
+      }
+    ],
+    "name": "dataBlockNumber",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "delegateOwner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "inputs": [
@@ -94,9 +192,9 @@ export const AppOwnerPluginV1Abi = [
             "type": "bytes32[]"
           },
           {
-            "internalType": "bytes[]",
-            "name": "proofs",
-            "type": "bytes[]"
+            "internalType": "uint256",
+            "name": "blockNumber",
+            "type": "uint256"
           }
         ],
         "internalType": "struct AppOwnerPluginV1Version",
@@ -130,9 +228,9 @@ export const AppOwnerPluginV1Abi = [
             "type": "bytes32[]"
           },
           {
-            "internalType": "bytes[]",
-            "name": "proofs",
-            "type": "bytes[]"
+            "internalType": "uint256",
+            "name": "blockNumber",
+            "type": "uint256"
           }
         ],
         "internalType": "struct AppOwnerPluginV1Version",
@@ -209,6 +307,11 @@ export const AppOwnerPluginV1Abi = [
       },
       {
         "internalType": "bytes[]",
+        "name": "_certs",
+        "type": "bytes[]"
+      },
+      {
+        "internalType": "bytes[]",
         "name": "_proofs",
         "type": "bytes[]"
       }
@@ -234,6 +337,11 @@ export const AppOwnerPluginV1Abi = [
         "internalType": "bytes32[]",
         "name": "_fingerprints",
         "type": "bytes32[]"
+      },
+      {
+        "internalType": "bytes[]",
+        "name": "_certs",
+        "type": "bytes[]"
       },
       {
         "internalType": "bytes[]",

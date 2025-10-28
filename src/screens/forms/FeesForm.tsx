@@ -1,10 +1,11 @@
 import {Stack, Typography} from "@mui/material";
 import {AvoirProperty, AvoirPropertyBox, AvoirPropertyTitle} from "@components/basic/AvoirProperty.tsx";
 import {formatBigIntWithUsd, formatNumberWithUsd, formatValueWithUsdOrPlaceholder, TBNB} from "@utils/format";
-import {isValueLoading} from "@components/anim/AvoirSkeleton.tsx";
+import {hasValueOrLoading} from "@components/anim/AvoirSkeleton.tsx";
 import {str} from "@localization/res.ts";
 import {RStr} from "@localization/ids.ts";
 import {parseEther} from "viem";
+import {isProtocolZero} from "@config";
 
 export interface FeesFormProps {
     topUpAmount?: number;
@@ -153,28 +154,28 @@ export function FeesForm(
 
                                     <AvoirPropertyTitle title={str(RStr.FeesForm_MainWallet)}/>
 
-                                    {isValueLoading(validatorFee, validatorFeeIsLoading) && (
+                                    {!isProtocolZero() && hasValueOrLoading(validatorFee, validatorFeeIsLoading) && (
                                         <AvoirProperty
                                             title={str(RStr.FeesForm_validatorFee)}
                                             value={formatValueWithUsdOrPlaceholder(validatorFee, usdRate, validatorFeeIsLoading)}
                                             isLoading={validatorFeeIsLoading}
                                         />
                                     )}
-                                    {isValueLoading(oracleFee, oracleFeeIsLoading) && (
+                                    {hasValueOrLoading(oracleFee, oracleFeeIsLoading) && (
                                         <AvoirProperty
                                             title={str(RStr.FeesForm_oracleFee)}
                                             value={formatValueWithUsdOrPlaceholder(oracleFee, usdRate, oracleFeeIsLoading)}
                                             isLoading={oracleFeeIsLoading}
                                         />
                                     )}
-                                    {isValueLoading(networkFee, networkFeeIsLoading) && (
+                                    {hasValueOrLoading(networkFee, networkFeeIsLoading) && (
                                         <AvoirProperty
                                             title={str(RStr.FeesForm_networkFee)}
                                             value={formatValueWithUsdOrPlaceholder(networkFee, usdRate, networkFeeIsLoading)}
                                             isLoading={networkFeeIsLoading}
                                         />
                                     )}
-                                    {isValueLoading(relayFee, relayFeeIsLoading) && (
+                                    {hasValueOrLoading(relayFee, relayFeeIsLoading) && (
                                         <AvoirProperty
                                             title={str(RStr.FeesForm_relayFee)}
                                             value={formatValueWithUsdOrPlaceholder(relayFee, usdRate, relayFeeIsLoading)}
@@ -188,7 +189,7 @@ export function FeesForm(
                                 <Stack spacing={1}>
                                     <AvoirPropertyTitle title={str(RStr.FeesForm_StorageWallet)}/>
 
-                                    {isValueLoading(storageFee, storageFeeIsLoading) && (
+                                    {hasValueOrLoading(storageFee, storageFeeIsLoading) && (
                                         <AvoirProperty
                                             title={str(RStr.FeesForm_settlePrepayFee)}
                                             value={formatValueWithUsdOrPlaceholder(storageFee, usdRate, storageFeeIsLoading, TBNB)}
@@ -196,7 +197,7 @@ export function FeesForm(
                                         />
                                     )}
 
-                                    {isValueLoading(storageGasFee, storageGasFeeIsLoading) && (
+                                    {hasValueOrLoading(storageGasFee, storageGasFeeIsLoading) && (
                                         <AvoirProperty
                                             title={str(RStr.FeesForm_gasFee)}
                                             value={formatValueWithUsdOrPlaceholder(storageGasFee, usdRate, storageGasFeeIsLoading, TBNB)}
@@ -222,7 +223,7 @@ export function FeesForm(
                 </Stack>
             }
 
-            {isValueLoading(totalFee, totalFeeIsLoading) && (
+            {hasValueOrLoading(totalFee, totalFeeIsLoading) && (
                 <Stack spacing={1}>
                     <AvoirPropertyBox>
                         <AvoirProperty

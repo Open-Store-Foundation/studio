@@ -60,7 +60,8 @@ interface SecondaryButtonProps {
     text: string
     onClick?: () => void,
     disabled?: boolean,
-    withIcon?: boolean,
+    icon?: () => ReactElement,
+    withForward?: boolean,
     sx?: SxProps,
     color?: OverridableStringUnion<
         'inherit' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning',
@@ -69,7 +70,7 @@ interface SecondaryButtonProps {
 }
 
 export function AvoirSecondaryButton(
-    {text, onClick, withIcon, disabled, sx, color}: SecondaryButtonProps,
+    {text, onClick, icon, withForward, disabled, sx, color}: SecondaryButtonProps,
 ) {
     return (
         <Button onClick={onClick}
@@ -86,6 +87,9 @@ export function AvoirSecondaryButton(
                     ...sx
                 }}>
 
+            {icon?.()}
+            {icon && <Box width="0.2rem"/>}
+
             <Typography
                 fontSize={14}
                 fontWeight={"600"}>
@@ -93,7 +97,7 @@ export function AvoirSecondaryButton(
             </Typography>
 
             {
-                withIcon && (
+                withForward && (
                     <Box display={"inline-flex"}>
                         <Box width="0.2rem"/>
                         <ArrowForwardIos sx={{fontSize: 14}}/>

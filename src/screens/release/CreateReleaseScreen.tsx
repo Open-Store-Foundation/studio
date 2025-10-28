@@ -29,7 +29,7 @@ import {
     AmountSummaryState,
     FeesModuleProps
 } from "@screens/forms/AmountsSummaryForm.tsx";
-import {appConfig} from "@config";
+import {appConfig, isProtocolZero} from "@config";
 import {NotEnoughAlert} from "./NotEnoughAlert.tsx"
 import {useSafeAccount} from "@hooks/useSafeAccount.ts";
 import {useCache} from "@di";
@@ -132,27 +132,30 @@ function InfoStep(
                 </Stack>
             </AvoirSectionTitledBox>
 
-            <AvoirSectionTitledBox
-                title={str(RStr.CreateReleaseScreen_validation_title)}
-                description={str(RStr.CreateReleaseScreen_validation_description)}
-                infoLink={AppRoute.Article.route(AppRoute.Article.Publishing)}
-                contentOffset={1}>
-                <Stack
-                    direction="row"
-                    spacing={3}
-                    width={"100%"}
-                    alignItems="center"
-                >
-                    {skipOptions.map((track) => (
-                        <AvoirTrackBox
-                            track={track}
-                            disabled={!track.id && selectedTrack === TrackId.None}
-                            isSelected={isValidate === track.id}
-                            onClick={() => onValidateChange(track.id)}
-                        />
-                    ))}
-                </Stack>
-            </AvoirSectionTitledBox>
+            {
+                !isProtocolZero() &&
+                <AvoirSectionTitledBox
+                    title={str(RStr.CreateReleaseScreen_validation_title)}
+                    description={str(RStr.CreateReleaseScreen_validation_description)}
+                    infoLink={AppRoute.Article.route(AppRoute.Article.Publishing)}
+                    contentOffset={1}>
+                    <Stack
+                        direction="row"
+                        spacing={3}
+                        width={"100%"}
+                        alignItems="center"
+                    >
+                        {skipOptions.map((track) => (
+                            <AvoirTrackBox
+                                track={track}
+                                disabled={!track.id && selectedTrack === TrackId.None}
+                                isSelected={isValidate === track.id}
+                                onClick={() => onValidateChange(track.id)}
+                            />
+                        ))}
+                    </Stack>
+                </AvoirSectionTitledBox>
+            }
         </Stack>
     );
 }
@@ -256,34 +259,44 @@ export function CreateReleaseScreen() {
         },
     ], []);
 
-    const trackOptions = useMemo(() => [
-        {
-            id: TrackId.None,
-            label: 'None',
-            color: 'text.primary',
-            description: str(RStr.CreateReleaseScreen_track_none_description),
-        },
-        {
-            id: TrackId.Release,
-            label: 'Release',
-            color: 'success.main',
-            description: str(RStr.CreateReleaseScreen_track_release_description)
-        },
-        {
-            id: TrackId.Beta,
-            label: 'Beta',
-            color: 'warning.main',
-            description: str(RStr.CreateReleaseScreen_track_beta_description),
-            disabled: true,
-        },
-        {
-            id: TrackId.Alpha,
-            label: 'Alpha',
-            color: 'error.main',
-            description: str(RStr.CreateReleaseScreen_track_alpha_description),
-            disabled: true,
-        },
-    ], []);
+    const trackOptions = useMemo(() => {
+        let basic = [
+            {
+                id: TrackId.Release,
+                label: 'Release',
+                color: 'success.main',
+                description: str(RStr.CreateReleaseScreen_track_release_description)
+            },
+            {
+                id: TrackId.Beta,
+                label: 'Beta',
+                color: 'warning.main',
+                description: str(RStr.CreateReleaseScreen_track_beta_description),
+                disabled: true,
+            },
+            {
+                id: TrackId.Alpha,
+                label: 'Alpha',
+                color: 'error.main',
+                description: str(RStr.CreateReleaseScreen_track_alpha_description),
+                disabled: true,
+            },
+        ]
+
+        if (isProtocolZero()) {
+            return basic
+        } else {
+            return [
+                {
+                    id: TrackId.None,
+                    label: 'None',
+                    color: 'text.primary',
+                    description: str(RStr.CreateReleaseScreen_track_none_description),
+                },
+                ...basic
+            ]
+        }
+    }, []);
 
     useAsyncEffect(async () => {
         const lastMirroredVersion = await ScAssetService.getLastBuildVersion(appAddress)

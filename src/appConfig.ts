@@ -20,16 +20,16 @@ const contracts = {
         crossChain: "0xa5B2c9194131A4E0BFaCbF9E5D6722c873159cb7" as Address,
     },
     bsctest: {
-        devFactory: "0xE994189222edE5fF9056aa00BB70a1eeF42880C7" as Address,
-        oracle: "0x0F61D8D6c9D6886ac7cba72716E1b98C4379E0f7" as Address,
-        store: "0x6Edac88EA58168a47ab61836bCbAD0Ac844498A6" as Address,
+        devFactory: "0x7bf2b3901E3198268ec071F43A08dBD365017354" as Address,
+        oracle: "0xCA21F6ab7D9Cf14444028394016066778Cbe1B4B" as Address,
+        store: "0x4dc802c0E64Eb0C9d9b278F70b6a7d6e21908a46" as Address,
         multicall: "0x3f7AdDD276bC5c1a2Fffb329DD718f1fa0625D84" as Address,
 
-        devAppPlugin: "0x48A93cF38ac4cE6FE16f2E8b8a9a7B24b46445A8" as Address,
-        devGfPlugin: "0x06cF16521A903971FF8F2635931dA3768e294350" as Address,
-        appOwnerPlugin: "0x77F67523F8b0e7D4519B91344F629c2180447B0f" as Address,
-        appDistributionPlugin: "0x51C3A4282FB9F00705Be26f11cB7EE4Cc20274C4" as Address,
-        appBuildPlugin: "0x0F09669588952cA48368dd8361662D549CcCE987" as Address,
+        appOwnerPlugin: "0xD2dfb8a2D0f2b90f3F912566F4c4Fb0a3e9Bc336" as Address,
+        appBuildPlugin: "0xe00e09e2028046DE01C9aEc7C683cF0ce08016B1" as Address,
+        appDistributionPlugin: "0x76F7A70d7eCf4483Fa08D10511F997c97b247737" as Address,
+        devAppPlugin: "0x374DA7507CB00FAEc54fa4226eF6c45eC99bA2E4" as Address,
+        devGfPlugin: "0xaE3f8bD0a3112aE5860a72DE494A238997210756" as Address,
 
         crossChain: "0xa5B2c9194131A4E0BFaCbF9E5D6722c873159cb7" as Address,
     }
@@ -38,11 +38,11 @@ const contracts = {
 const price = {
     lh: {
         oracleAssetlink: parseEther("0.005"),
-        validatorBuild: parseEther("0.1"),
+        validatorBuild: parseEther("0"),
     },
     bsctest: {
         oracleAssetlink: parseEther("0.001"),
-        validatorBuild: parseEther("0.01"),
+        validatorBuild: parseEther("0"),
     },
 }
 
@@ -71,16 +71,43 @@ const confirmations = {
     bsctest: 10,
 }
 
+function grfdNodeUrl() {
+    return import.meta.env.VITE_GREENFIELD_NODE!!
+}
+
+function graphNodeUrl() {
+    return import.meta.env.VITE_GRAPH_NODE!!
+}
+
+function projectId() {
+    return import.meta.env.VITE_WAGMI_PROJECT_ID!!
+}
+
+function chainProfile(): ChainEnv {
+    return import.meta.env.VITE_CHAIN_NAME as ChainEnv || "bsctest"
+}
+
+function apiClientUrl() {
+    return import.meta.env.VITE_CLIENT_API_URL || "http://localhost:8081";
+}
+
+function gfAuthTtl() {
+    return Number(import.meta.env.VITE_GREENFEILD_AUTH_TL) || 7 * 24 * 60 * 60 * 1000;
+}
+
 type ChainEnv = "lh" | "bsctest";
 const chainEnv: ChainEnv = chainProfile()
 
 export const appConfig = {
     // @ts-ignore
     isLocalhost: chainEnv === "lh",
-    baseClientUrl: apiClientUrl(),
+    chainName: chainEnv,
     // TODO maybe I should upload it somewhere
     // TODO from the other side the target user is a dev so it's possible to see actual version with history
     proofGenLUrl: "https://github.com/Open-Store-Foundation/studio/blob/main/src/assets/proof_gen.py",
+
+    clientApiVersion: 1,
+    baseClientUrl: apiClientUrl(),
 
     contracts: contracts[chainEnv]!!,
     prices: price[chainEnv]!!,
@@ -121,6 +148,7 @@ export const appConfig = {
     defaultBucketPlaceholder: "bucket-placeholder",
     defaultBucketTopUp: 0.01,
     defaultGlobalFamilyGroup: 1,
+    protocolVersion: 0,
 
     maxDevNameLength: 50,
     maxOwnerCerts: 10,
@@ -129,26 +157,6 @@ export const appConfig = {
     buildQuoteMultiplayer: 10,
 }
 
-function grfdNodeUrl() {
-    return import.meta.env.VITE_GREENFIELD_NODE!!
-}
-
-function graphNodeUrl() {
-    return import.meta.env.VITE_GRAPH_NODE!!
-}
-
-function projectId() {
-    return import.meta.env.VITE_WAGMI_PROJECT_ID!!
-}
-
-function chainProfile(): ChainEnv {
-    return import.meta.env.VITE_CHAIN_NAME as ChainEnv || "bsctest"
-}
-
-function apiClientUrl() {
-    return import.meta.env.VITE_CLIENT_API_URL || "http://localhost:8081";
-}
-
-function gfAuthTtl() {
-    return Number(import.meta.env.VITE_GREENFEILD_AUTH_TL) || 7 * 24 * 60 * 60 * 1000;
+export function isProtocolZero() {
+    return appConfig.protocolVersion === 0;
 }

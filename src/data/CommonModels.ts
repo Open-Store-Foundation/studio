@@ -30,16 +30,17 @@ export interface AppOwnerInfo {
 export interface AppCertificateProof {
     ordinal: number;
     fingerprint: string;
+    cert: string;
     proof: string;
 }
 
 export class AppCertificateProofFactory {
     static emptyProof(id: number): AppCertificateProof {
-        return {ordinal: id, fingerprint: "", proof: ""}
+        return {ordinal: id, fingerprint: "", cert: "", proof: ""}
     }
 
-    static defaultProof(fingerprint: string, proof: string): AppCertificateProof {
-        return {ordinal: -1, fingerprint: fingerprint, proof: proof}
+    static defaultProof(fingerprint: string, cert?: string, proof?: string): AppCertificateProof {
+        return {ordinal: -1, fingerprint: fingerprint, cert: cert || "", proof: proof || ""}
     }
 }
 

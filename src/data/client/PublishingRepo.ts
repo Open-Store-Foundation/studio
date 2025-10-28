@@ -87,6 +87,13 @@ export interface BuildRequest {
 export interface AndroidPublishingResponse {
     published: Publishing[];
     reviewing: BuildRequest[];
+    proof?: ValidationProof;
+}
+
+export interface ValidationProof {
+    assetAddress: Address;
+    ownerVersion: number;
+    status: ApkValidationStatus;
 }
 
 export class PublishingRepo {

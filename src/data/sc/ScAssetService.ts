@@ -1,5 +1,5 @@
 import {AppOwnerPluginV1Abi} from "./abi/AppOwnerPluginV1.ts";
-import {decodeEventLog, encodeFunctionData, fromHex, Hex, Log, parseAbiItem, toHex} from "viem";
+import {decodeEventLog, encodeFunctionData, fromHex, Hex, hexToBigInt, Log, parseAbiItem, toHex} from "viem";
 import {AppBuildsPluginV1Abi} from "./abi/AppBuildsPluginV1.ts";
 import {Address, AndroidTypeId, AppOwnerInfo, CategoryId, PlatformId, ProtocolId} from "@data/CommonModels.ts";
 import {AppStorage} from "@data/storage/AppStorage.ts";
@@ -25,7 +25,12 @@ export interface ScApp {
 export interface ScAppOwnerState {
     domain: string;
     fingerprints: string[];
+    blockNumber: bigint;
+}
+
+export interface ScAppOwnerProofState {
     proofs: string[];
+    certs: string[];
 }
 
 export enum ScAppDistributionType {
@@ -302,6 +307,10 @@ export class ScAssetService extends ScBaseService {
             return `0x${p.fingerprint.replaceAll(":", "")}`
         });
 
+        const certs = info.proofs.map((p) => {
+            return p.cert
+        });
+
         const proofs = info.proofs.map((p) => {
             return p.proof
         });
@@ -310,7 +319,7 @@ export class ScAssetService extends ScBaseService {
             abi: AppOwnerPluginV1Abi,
             address: appAddress,
             functionName: "setAppOwner",
-            args: [sender, info.domain, fingers, proofs],
+            args: [sender, info.domain, fingers, certs, proofs],
         }
     }
 
@@ -410,6 +419,10 @@ export class ScAssetService extends ScBaseService {
             return `0x${p.fingerprint.replaceAll(":", "")}`
         });
 
+        const certs = info.proofs.map((p) => {
+            return p.cert
+        });
+
         const proofs = info.proofs.map((p) => {
             return p.proof
         });
@@ -418,7 +431,7 @@ export class ScAssetService extends ScBaseService {
             abi: AppOwnerPluginV1Abi,
             address: appAddress,
             functionName: "setAppOwner",
-            args: [info.domain, fingers, proofs],
+            args: [info.domain, fingers, certs, proofs],
             account: sender,
         }
     }
@@ -540,27 +553,36 @@ export class ScAssetService extends ScBaseService {
     // /////////////////////
     // READ ONLY OWNER
     // /////////////////////
-    static async getOwnerState(appAddress: Address)  {
-        const data = await this.reader.readContract(
-            {
-                abi: AppOwnerPluginV1Abi,
-                address: appAddress,
-                functionName: "getState",
-                args: [],
+    static async getOwnerState(appAddress: Address): Promise<ScAppOwnerState> {
+        return await this.cache().getOrLoad(
+            CacheKeys.AppOwnerState.key(appAddress), CacheKeys.AppOwnerState.ttl,
+            async () => {
+                const data = await this.reader.readContract(
+                    {
+                        abi: AppOwnerPluginV1Abi,
+                        address: appAddress,
+                        functionName: "getState",
+                        args: [],
+                    }
+                )
+
+                return this.parseOwnerState(data)
             }
         )
-
-        return this.parseOwnerState(data)
     }
 
     private static parseOwnerState(data: any) {
         return {
             domain: data.domain,
             fingerprints: data.fingerprints.map((p: string) => {
-                return p.replace("0x", "")
-                    .match(/.{2}/g)?.join(":") || ""}
+                    return p
+                        .replace("0x", "")
+                        .match(/.{2}/g)?.join(":")
+                        .toUpperCase()
+                        || ""
+                }
             ),
-            proofs: data.proofs,
+            blockNumber: data.blockNumber
         } as ScAppOwnerState
     }
 
@@ -630,5 +652,60 @@ export class ScAssetService extends ScBaseService {
     static resetAllCache() {
         this.cache()
             .clean()
+    }
+
+    static async getOwnerProofsFromEvents(appAddress: Address, blockNumber: bigint): Promise<ScAppOwnerProofState> {
+        return await this.cache().getOrLoad(
+            CacheKeys.AppOwnerProofs.key(appAddress), CacheKeys.AppOwnerProofs.ttl,
+            async () => {
+                const currentVersion = await this.reader.readContract({
+                    abi: AppOwnerPluginV1Abi,
+                    address: appAddress,
+                    functionName: "ownerVersion",
+                    args: [],
+                }) as bigint
+
+                const event = parseAbiItem(
+                    "event AppOwnerChanged(uint256 indexed version, bytes[] certs, bytes[] proofs)"
+                )
+
+                const logs = await this.reader.getLogs({
+                    address: appAddress,
+                    event,
+                    fromBlock: blockNumber,
+                    toBlock: blockNumber,
+                })
+
+                let log: any | null = null
+                for (const ptr of logs) {
+                    const version = hexToBigInt(ptr.topics[1])
+                    if (version === currentVersion) {
+                        log = ptr
+                        break
+                    }
+                }
+
+                if (!log) {
+                    return { certs: [] as string[], proofs: [] as string[] }
+                }
+
+                const certs = (log.args.certs as `0x${string}`[])
+                const proofs = (log.args.proofs as `0x${string}`[])
+
+                return { certs, proofs } as ScAppOwnerProofState
+            }
+        )
+    }
+
+    static async getOwnerStateWithProofs(appAddress: Address) {
+        const owner = await this.getOwnerState(appAddress)
+        const extra = await this.getOwnerProofsFromEvents(appAddress, owner.blockNumber)
+
+        const proof = {
+            certs: extra.certs,
+            proofs: extra.proofs,
+        } as ScAppOwnerProofState
+
+        return { owner, proof }
     }
 }

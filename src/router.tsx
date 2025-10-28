@@ -39,7 +39,7 @@ export const AppRoute = {
         },
     },
     Social: {
-        X: "https://x.com/openstorefnd",
+        X: "https://x.com/openstorefndn",
         Discord: "https://discord.gg/CPmjuPNt",
     },
     Tg: {

@@ -7,7 +7,8 @@ import {
     ScAppSyncState,
     ScOracleService,
     ScOracleType,
-    ScOwnershipVerificationStatus
+    ScOwnershipVerificationStatus,
+    ScOracleFactory,
 } from "@data/sc/ScOracleService.ts";
 import AccessTimeOutlined from "@mui/icons-material/AccessTimeOutlined";
 import CancelOutlined from "@mui/icons-material/CancelOutlined";
@@ -26,6 +27,7 @@ import {ScreenEmpty} from "@components/basic/ScreenEmpty.tsx";
 import {RStr} from "@localization/ids.ts";
 import {str} from "@localization/res.ts";
 import {IconRefresh} from "@tabler/icons-react";
+import {useMemo} from "react";
 
 export const renderOracleIcon = (sync: ScAppSyncState) => {
     if (sync.status == undefined) {
@@ -103,6 +105,8 @@ export const renderOracleType = (type: ScOracleType): string => {
             return str(RStr.AppStatusScreen_oracleType_ownership)
         case ScOracleType.OwnershipReview:
             return str(RStr.AppStatusScreen_oracleType_ownershipReview)
+        case ScOracleType.CertificateProofs:
+            return str(RStr.AppStatusScreen_oracleType_ownershipProof)
         default:
             return str(RStr.AppStatusScreen_oracleType_ownership)
     }
@@ -117,7 +121,6 @@ const renderBuildStatusIcon = (status: ApkValidationStatus) => {
         case ApkValidationStatus.InvalidApkFormat:
         case ApkValidationStatus.InvalidSignBlockFormat:
         case ApkValidationStatus.Zip64NotSupported:
-        case ApkValidationStatus.HashMismatch:
 
         // Group 20s
         case ApkValidationStatus.TooManySigners:
@@ -147,6 +150,7 @@ const renderBuildStatusIcon = (status: ApkValidationStatus) => {
 
         // Group 70s
         case ApkValidationStatus.ProofNotFound:
+        case ApkValidationStatus.HashMismatch:
         case ApkValidationStatus.InvalidProof:
             return <CancelOutlined color="error" fontSize={"small"}/>
 
@@ -169,6 +173,7 @@ const renderBuildStatusTitle = (status: ApkValidationStatus): string => {
         case ApkValidationStatus.TooManySigners:
         case ApkValidationStatus.NoSignersFound:
         case ApkValidationStatus.NoDigestFound:
+        case ApkValidationStatus.HashMismatch:
 
         // Group 30s
         case ApkValidationStatus.UnknownSignatureAlgorithm:
@@ -192,12 +197,21 @@ const renderBuildStatusTitle = (status: ApkValidationStatus): string => {
 
         // Group 70s
         case ApkValidationStatus.ProofNotFound:
-        case ApkValidationStatus.HashMismatch:
+        case ApkValidationStatus.IncorrectCertFormat:
         case ApkValidationStatus.InvalidProof:
             return str(RStr.AppStatusScreen_build_error)
 
         default:
             return str(RStr.AppStatusScreen_build_unknown)
+    }
+}
+
+const renderProofStatusMessage = (status: ApkValidationStatus): string => {
+    switch (status) {
+        case ApkValidationStatus.Success:
+            return str(RStr.AppStatusScreen_oracle_success_desc)
+        default:
+            return renderBuildStatusMessage(status)
     }
 }
 
@@ -259,6 +273,8 @@ const renderBuildStatusMessage = (status: ApkValidationStatus) => {
             return str(RStr.AppStatusScreen_build_hashMismatch)
         case ApkValidationStatus.IncorrectCertFormat:
             return str(RStr.AppStatusScreen_build_incorrectCertFormat)
+        case ApkValidationStatus.InvalidProof:
+            return str(RStr.AppStatusScreen_build_invalidProof)
 
         default:
             return str(RStr.AppStatusScreen_build_unknownStatus)
@@ -285,6 +301,32 @@ const oracleColumns: GridColDef[] = [
     {
         field: 'status', headerName: 'Status', flex: 1, minWidth: 10,
         renderCell: (params) => {
+            const row = params.row as ScAppSyncState
+
+            const renderIcon = (row: ScAppSyncState) => {
+                if (row.type === ScOracleType.CertificateProofs) {
+                    return renderBuildStatusIcon(row.status as ApkValidationStatus)
+                } else {
+                    return renderOracleIcon(row)
+                }
+            }
+
+            const renderTitle = (row: ScAppSyncState) => {
+                if (row.type === ScOracleType.CertificateProofs) {
+                    return renderBuildStatusTitle(row.status as ApkValidationStatus)
+                } else {
+                    return renderOracleTitle(row.status)
+                }
+            }
+
+            const renderDescription = (row: ScAppSyncState) => {
+                if (row.type === ScOracleType.CertificateProofs) {
+                    return renderProofStatusMessage(row.status as ApkValidationStatus)
+                } else {
+                    return renderOracleDescription(row)
+                }
+            }
+
             return (
                 <Stack
                     height={"100%"}
@@ -295,13 +337,13 @@ const oracleColumns: GridColDef[] = [
                         alignItems={"center"}
                         spacing={1}
                     >
-                        {renderOracleIcon(params.row)}
+                        {renderIcon(row)}
 
                         <Typography
                             fontSize={"0.9rem"}
                             variant={"body1"}
                             fontWeight={"bold"}>
-                            {renderOracleTitle(params.row.status)}
+                            {renderTitle(row)}
                         </Typography>
                     </Stack>
 
@@ -309,7 +351,7 @@ const oracleColumns: GridColDef[] = [
                         variant={"caption"}
                         color={"text.secondary"}
                         fontWeight={"bold"}>
-                        {renderOracleDescription(params.row)}
+                        {renderDescription(row)}
                     </Typography>
                 </Stack>
             )
@@ -438,6 +480,20 @@ export function AppStatusScreen() {
         }
     }, [isFetching, publishRetryCount])
 
+    const oracleRows = useMemo(() => {
+        const base = oracleData ?? []
+        const proof = publishData?.proof
+
+        if (!proof) {
+            return base
+        }
+
+        return [
+            ...base,
+            ScOracleFactory.ownershipProof(proof.ownerVersion, proof.status)
+        ]
+    }, [oracleData, publishData])
+
     return (
         <PageContainer>
             <AvoirScreenTitle
@@ -479,7 +535,7 @@ export function AppStatusScreen() {
                         }}>
 
                         <AvoirTableView
-                            rows={oracleData}
+                            rows={oracleRows}
                             columns={oracleColumns}
                             isSelectable={false}
                             isLoading={isLoading}
@@ -527,7 +583,6 @@ export function AppStatusScreen() {
                                 ? <ScreenEmpty {...DefaultScreenErrorProps} />
                                 : <AvoirTableView
                                     rows={publishData?.published}
-                                    // rows={[]}
                                     columns={publishingColumns}
                                     isSelectable={false}
                                     isLoading={isPublishLoading}

@@ -24,9 +24,8 @@ export function useObserveGreenfield<T>(poll: (data: T | null) => Promise<boolea
         let func = async () => {
             let tries = 0;
 
+            console.log("Start observation iteration!");
             while (tries < MAX_TRIES) {
-                console.log("Start observation iteration!");
-
                 if (!isStarted) {
                     console.log("Observation stopped");
                     break

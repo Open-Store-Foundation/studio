@@ -1,4 +1,4 @@
-export const OpenStoreAbi = [
+export const OpenStoreV1Abi = [
   {
     "inputs": [
       {
@@ -104,7 +104,7 @@ export const OpenStoreAbi = [
             "type": "uint256"
           }
         ],
-        "internalType": "struct OpenStoreConfig",
+        "internalType": "struct OpenStoreConfigV1",
         "name": "_config",
         "type": "tuple"
       }
@@ -787,7 +787,7 @@ export const OpenStoreAbi = [
             "type": "uint256"
           }
         ],
-        "internalType": "struct OpenStoreConfig",
+        "internalType": "struct OpenStoreConfigV1",
         "name": "",
         "type": "tuple"
       }
@@ -917,7 +917,7 @@ export const OpenStoreAbi = [
             "type": "address"
           }
         ],
-        "internalType": "struct BlockRef",
+        "internalType": "struct BlockRefV1",
         "name": "",
         "type": "tuple"
       }
@@ -1168,7 +1168,7 @@ export const OpenStoreAbi = [
     "inputs": [
       {
         "internalType": "address",
-        "name": "validator",
+        "name": "_validator",
         "type": "address"
       }
     ],
@@ -1452,7 +1452,7 @@ export const OpenStoreAbi = [
             "type": "address"
           }
         ],
-        "internalType": "struct BlockRef",
+        "internalType": "struct BlockRefV1",
         "name": "blockRef",
         "type": "tuple"
       }
@@ -1494,13 +1494,6 @@ export const OpenStoreAbi = [
       }
     ],
     "name": "removePlugin",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "renounceOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1644,19 +1637,6 @@ export const OpenStoreAbi = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "newOwner",
-        "type": "address"
-      }
-    ],
-    "name": "transferOwnership",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -1827,7 +1807,7 @@ export const OpenStoreAbi = [
             "type": "uint256"
           }
         ],
-        "internalType": "struct OpenStoreConfig",
+        "internalType": "struct OpenStoreConfigV1",
         "name": "_config",
         "type": "tuple"
       }
@@ -1846,14 +1826,14 @@ export const OpenStoreAbi = [
       },
       {
         "internalType": "uint64",
-        "name": "version",
+        "name": "validatorVersion",
         "type": "uint64"
       }
     ],
     "name": "validatorAssignStatus",
     "outputs": [
       {
-        "internalType": "enum OpenStore.ValidatorAssignStatus",
+        "internalType": "enum OpenStoreV1.ValidatorAssignStatus",
         "name": "",
         "type": "uint8"
       }

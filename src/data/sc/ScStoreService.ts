@@ -1,5 +1,5 @@
 import {appConfig} from "@config";
-import {OpenStoreAbi} from "./abi/OpenStore.ts";
+import {OpenStoreV0Abi} from "./abi/OpenStoreV0.ts";
 import {ethers, toBeHex, ZeroAddress} from "ethers";
 import {Address, ReqTypeId, TrackId} from "@data/CommonModels.ts";
 import {ScBaseService, ScMulticallData} from "@data/sc/ScBaseService.ts";
@@ -8,7 +8,7 @@ import {ScAppBuild, ScAssetService} from "@data/sc/ScAssetService.ts";
 
 export const ScStoreServiceConfig = {
     address: appConfig.contracts.store,
-    abi: OpenStoreAbi,
+    abi: OpenStoreV0Abi,
 }
 
 export class ScStoreService extends ScBaseService {

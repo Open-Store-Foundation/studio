@@ -316,7 +316,7 @@ export class GreenfieldClient {
     }
 
     apkPath(appInfo: ApkInfo): string {
-        return `${this.getAppFolder(appInfo.packageName)}/v/${appInfo.versionName}/${appInfo.versionCode}/${appInfo.checksum}.apk`
+        return `${this.getAppFolder(appInfo.packageName)}/android/v/${appInfo.versionName}/${appInfo.versionCode}/${appInfo.checksum.toLowerCase()}.apk`
     }
 
     logoPath(appPackage: string): string {
@@ -346,7 +346,7 @@ export class GreenfieldClient {
     }
 
     private getAppFolder(appPackage: string) {
-        return `${GreenfieldClient.INDEX_FOLDER_NAME}/${appPackage.replaceAll(".", "_")}`
+        return `${GreenfieldClient.INDEX_FOLDER_NAME}/${appPackage.replaceAll(".", "_")}/android`
     }
 
     async getAppVersion(bucket: string, appInfo: ApkInfo): Promise<GfBuildFile | null> {

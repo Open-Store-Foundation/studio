@@ -28,11 +28,14 @@ export function prepare_en_locale(): Map<StrToken, string> {
 
     map.set(RStr.AppOwnerInfoForm_title, "Ownership info");
     map.set(RStr.AppOwnerInfoForm_description, "Provide ownership details to verify your app and show users the official website that owns it.");
+    map.set(RStr.AppOwnerInfoForm_reveal_certs, "Reveal Proofs");
+    map.set(RStr.AppOwnerInfoForm_reveal_title, "Certificates (DER) and signature proofs are hidden. Press the button below to reveal.");
     map.set(RStr.AppOwnerInfoForm_website_label, "Website");
     map.set(RStr.AppOwnerInfoForm_website_helper, "Website for ownership verification through '.well-known/assetlinks.json'");
     map.set(RStr.AppOwnerInfoForm_website_error, "Website shouldn't have path");
     map.set(RStr.AppOwnerInfoForm_certificate_label, "Certificate #");
     map.set(RStr.AppOwnerInfoForm_certificate_fingerprint_helper, "SHA-256 fingerprint of certificate");
+    map.set(RStr.AppOwnerInfoForm_certificate_cert_helper, "DER certificate of fingerprint");
     map.set(RStr.AppOwnerInfoForm_certificate_proof_helper, "Signature proof of ownership");
     map.set(RStr.AppOwnerInfoForm_add_certificate, "Add Certificate");
     map.set(RStr.AppOwnerInfoForm_how_to_generate_title, "How to generate fingerprint and proof?");
@@ -40,12 +43,14 @@ export function prepare_en_locale(): Map<StrToken, string> {
     map.set(RStr.AppOwnerInfoForm_how_to_generate_step2, "2. In terminal specify your keystore and PK's alias you want to proof");
     map.set(RStr.AppOwnerInfoForm_how_to_generate_note1, "* Replace all parameters except address with your own data");
     map.set(RStr.AppOwnerInfoForm_how_to_generate_note2, "* You can also use LLMs to ensure code is safe");
-    map.set(RStr.AppOwnerInfoForm_ownership_alert, "Ownership verification is needed, users will be able to find and download your application only by address!");
+    map.set(RStr.AppOwnerInfoForm_ownership_alert, "Ownership verification is required, otherwise users will be able to find your application only by address!");
     map.set(RStr.AppOwnerInfoForm_no_fingerprint, "No fingerprint");
+    map.set(RStr.AppOwnerInfoForm_no_cert, "No certificate");
     map.set(RStr.AppOwnerInfoForm_no_proof, "No proof");
     map.set(RStr.AppOwnerInfoForm_this_link, "this link");
     map.set(RStr.AppOwnerInfoForm_your_address, "YOUR_ADDRESS");
     map.set(RStr.AppOwnerInfoForm_fingerprint_placeholder, "SHA-256 Fingerprint");
+    map.set(RStr.AppOwnerInfoForm_cert_placeholder, "Certificate");
     map.set(RStr.AppOwnerInfoForm_proof_placeholder, "Proof");
 
     map.set(RStr.AppGeneralInfoForm_title, "General info");
@@ -217,6 +222,7 @@ export function prepare_en_locale(): Map<StrToken, string> {
     map.set(RStr.AppStatusScreen_oracle_contentReadingError_desc, "Failed to read assetlinks");
     map.set(RStr.AppStatusScreen_oracleType_ownership, "Ownership");
     map.set(RStr.AppStatusScreen_oracleType_ownershipReview, "Ownership Review");
+    map.set(RStr.AppStatusScreen_oracleType_ownershipProof, "Certificates");
     map.set(RStr.AppStatusScreen_build_verified, "Verified");
     map.set(RStr.AppStatusScreen_build_error, "Error");
     map.set(RStr.AppStatusScreen_build_unknown, "Unknown");
@@ -241,6 +247,7 @@ export function prepare_en_locale(): Map<StrToken, string> {
     map.set(RStr.AppStatusScreen_build_digestAlgoMissing, "Digest algo missing");
     map.set(RStr.AppStatusScreen_build_hashMismatch, "Hash mismatch");
     map.set(RStr.AppStatusScreen_build_incorrectCertFormat, "Incorrect certificate format");
+    map.set(RStr.AppStatusScreen_build_invalidProof, "Invalid proof");
     map.set(RStr.AppStatusScreen_build_unknownStatus, "Unknown status");
 
     map.set(RStr.AppBuildsScreen_title, "Builds overview");

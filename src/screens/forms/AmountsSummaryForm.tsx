@@ -300,7 +300,6 @@ export function AmountsSummaryForm(props: FeesModuleProps) {
                 validatorFee: withValidation ? appConfig.prices.validatorBuild : undefined,
                 validatorFeeIsLoading: false,
 
-
                 relayFee: totalRelayFee,
                 relayFeeIsLoading: false,
 

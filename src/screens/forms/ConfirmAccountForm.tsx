@@ -4,7 +4,7 @@ import {Address} from "@data/CommonModels.ts";
 import {str} from "@localization/res.ts";
 import {RStr} from "@localization/ids.ts";
 import {BNB, formatValueWithUsdOrPlaceholder, TBNB} from "@utils/format.ts";
-import {isValueLoading} from "@components/anim/AvoirSkeleton.tsx";
+import {hasValueOrLoading} from "@components/anim/AvoirSkeleton.tsx";
 
 interface ConfirmAccountFormProps {
     devName: string | null,
@@ -86,7 +86,7 @@ export function ConfirmAccountForm(
                 />
             }
 
-            {isValueLoading(accountBalance, accountBalanceIsLoading) && (
+            {hasValueOrLoading(accountBalance, accountBalanceIsLoading) && (
                 <AvoirProperty
                     title={str(RStr.ConfirmAccountForm_storage_balance)}
                     value={formatValueWithUsdOrPlaceholder(accountBalance, usdRate, accountBalanceIsLoading, TBNB)}
@@ -94,7 +94,7 @@ export function ConfirmAccountForm(
                 />
             )}
 
-            {isValueLoading(walletBalance, walletBalanceIsLoading) && (
+            {hasValueOrLoading(walletBalance, walletBalanceIsLoading) && (
                 <AvoirProperty
                     title={str(RStr.ConfirmAccountForm_storage_balance)}
                     value={formatValueWithUsdOrPlaceholder(accountBalance, usdRate, walletBalanceIsLoading, TBNB)}
@@ -136,7 +136,7 @@ export function BalancesForm(
 
     return (
         <AvoirPropertyBox title={"Balances"}>
-            {isValueLoading(accountBalance, accountBalanceIsLoading) && (
+            {hasValueOrLoading(accountBalance, accountBalanceIsLoading) && (
                 <AvoirProperty
                     title={str(RStr.ConfirmAccountForm_storage_balance)}
                     value={formatValueWithUsdOrPlaceholder(accountBalance, usdRate, accountBalanceIsLoading, TBNB)}
@@ -144,7 +144,7 @@ export function BalancesForm(
                 />
             )}
 
-            {isValueLoading(walletBalance, walletBalanceIsLoading) && (
+            {hasValueOrLoading(walletBalance, walletBalanceIsLoading) && (
                 <AvoirProperty
                     title={str(RStr.ConfirmAccountForm_wallet_balance)}
                     value={formatValueWithUsdOrPlaceholder(walletBalance, usdRate, walletBalanceIsLoading, BNB)}

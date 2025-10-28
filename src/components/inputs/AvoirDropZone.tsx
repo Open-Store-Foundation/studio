@@ -83,6 +83,7 @@ export function AvoirDropZone({
                 border: theme => `${isDragging ? 2 : 1}px dashed ${isDragging ? theme.palette.primary.main : theme.palette.divider}`,
                 borderRadius: 2,
                 bgcolor: isDragging ? 'action.hover' : 'background.paper',
+                px: 2,
                 '&:hover': {
                     bgcolor: inProgress ? 'background.paper' : 'action.hover',
                     borderColor: inProgress ? 'divider' : 'primary.main',
@@ -127,10 +128,10 @@ export function AvoirDropZone({
                     <CircularProgress size={24}/>
                 </Stack>
             ) : selectedFile ? (
-                <Stack spacing={1} alignItems="center">
+                <Stack spacing={1} alignItems="center" sx={{ width: '100%', px: 1 }}>
                     <Upload color="primary" sx={{fontSize: 40}}/>
-                    <Stack alignItems="center">
-                        <Typography variant="subtitle1" color="primary">
+                    <Stack alignItems="center" sx={{ width: '100%' }}>
+                        <Typography maxWidth={"500px"} variant="subtitle1" color="primary" title={selectedFile.name} noWrap>
                             {selectedFile.name}
                         </Typography>
                         <Typography variant="subtitle2" color="text.main">
@@ -142,17 +143,19 @@ export function AvoirDropZone({
                     </Typography>
                 </Stack>
             ) : (
-                <Stack spacing={1} alignItems="center">
+                <Stack spacing={1} alignItems="center" sx={{ width: '100%', px: 1 }}>
                     <CloudUpload sx={{fontSize: 40, color: 'text.secondary'}}/>
-                    <Stack alignItems="center">
-                        <Typography variant="subtitle1" color="text.main">
+                    <Stack alignItems="center" sx={{ width: '100%' }}>
+
+                        <Typography variant="subtitle1" color="text.main" title={title || defaultTitle}>
                             {title || defaultTitle}
                         </Typography>
                         <Typography variant="caption" color="text.main">
                             or click to browse
                         </Typography>
                     </Stack>
-                    <Typography variant="caption" color="text.secondary">
+
+                    <Typography variant="caption" color="text.secondary" title={subtitle || defaultSubtitle}>
                         {subtitle || defaultSubtitle}
                     </Typography>
                 </Stack>
