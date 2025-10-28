@@ -18,10 +18,6 @@ export function AvoirSkeleton(
 
 // Helper function to determine if a component should be displayed
 // when its value is undefined but it's in a loading state
-export const hasValueOrLoading = (value: number | bigint | undefined, isLoading?: boolean): boolean => {
+export const hasValueOrLoading = (value: number | bigint | string | undefined, isLoading?: boolean): boolean => {
     return value !== undefined || isLoading === true;
 };
-
-export const hasValue = (value: any | undefined): boolean => {
-    return value !== undefined && value > 0;
-}
