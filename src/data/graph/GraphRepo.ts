@@ -22,12 +22,12 @@ export class GraphRepo {
 
     async getPublishers(ownerAddress: Address): Promise<DevAccount[]> {
         const response = await this.http.get(`/publishers/${ownerAddress}`);
-        return response.data.accounts;
+        return response.data.data.accounts;
     }
 
     async getApps(publisherAddress: Address): Promise<ScApp[]> {
         const response = await this.http.get(`/apps/${publisherAddress}`);
-        const apps = response.data.apps.map((app: GraphApp, id: number) => {
+        const apps = response.data.data.apps.map((app: GraphApp, id: number) => {
             const data = {
                 id: id,
                 address: app.id,

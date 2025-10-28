@@ -129,7 +129,7 @@ export function AltIntroDevsScreen() {
                                 !isLoading && (
                                     <Stack spacing={{xs: 1.25, sm: 1.5}}>
                                         {
-                                            accounts && accounts.length > 0 && (
+                                            accounts != null && accounts.length > 0 && (
                                                 accounts.map((item) => (
                                                     <AvoirCardItem
                                                         key={item.name}
