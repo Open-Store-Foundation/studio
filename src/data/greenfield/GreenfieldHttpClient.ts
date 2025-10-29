@@ -174,7 +174,7 @@ export class ObjectClient {
                 const [versionName, versionCode, checksum] = name.split("/");
 
                 return <GfBuildFile>{
-                    id: obj.Id,
+                    id: Number(obj.Id),
                     versionName,
                     versionCode: parseInt(versionCode),
                     checksum,
