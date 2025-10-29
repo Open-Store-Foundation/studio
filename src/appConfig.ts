@@ -104,7 +104,7 @@ export const appConfig = {
     chainName: chainEnv,
     // TODO maybe I should upload it somewhere
     // TODO from the other side the target user is a dev so it's possible to see actual version with history
-    proofGenLUrl: "https://github.com/Open-Store-Foundation/studio/blob/main/src/assets/proof_gen.py",
+    proofGenLUrl: "https://github.com/Open-Store-Foundation/studio/blob/main/scripts/proof_gen.py",
 
     clientApiVersion: 1,
     baseClientUrl: apiClientUrl(),
