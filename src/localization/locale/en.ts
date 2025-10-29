@@ -426,7 +426,7 @@ export function prepare_en_locale(): Map<StrToken, string> {
     map.set(RStr.FileSelectorDrawer_buildList_loading, "Loading builds...");
     map.set(RStr.FileSelectorDrawer_buildList_version, "{type} v{name}");
 
-    map.set(RStr.FileUploaderDrawer_title, "Upload new file");
+    map.set(RStr.FileUploaderDrawer_title, "Upload asset file");
     map.set(RStr.FileUploaderDrawer_button_close, "Close");
     map.set(RStr.FileUploaderDrawer_button_upload, "Upload");
     map.set(RStr.FileUploaderDrawer_uploading, "Uploading...");
@@ -435,7 +435,7 @@ export function prepare_en_locale(): Map<StrToken, string> {
     map.set(RStr.FileUploaderDrawer_confirm_title, "Upload file");
     map.set(RStr.FileUploaderDrawer_confirm_description, "Are you sure you want to upload this file?");
 
-    map.set(RStr.LogoUploaderDrawer_title, "Upload app logo");
+    map.set(RStr.LogoUploaderDrawer_title, "Upload asset logo");
     map.set(RStr.LogoUploaderDrawer_button_close, "Close");
     map.set(RStr.LogoUploaderDrawer_button_upload, "Upload Logo");
 
@@ -502,6 +502,17 @@ export function prepare_en_locale(): Map<StrToken, string> {
     map.set(RStr.PngLogoValidator_error_invalidImage, "Invalid or corrupted image file");
     map.set(RStr.PngLogoValidator_dropZone_title, "Drag and drop your logo here");
     map.set(RStr.PngLogoValidator_dropZone_subtitle, "512x512 PNG with transparency, max 1MB");
+
+    map.set(RStr.AvoirDropZone_defaultTitle, "Drag and drop your file here");
+    map.set(RStr.AvoirDropZone_defaultSubtitle_default, "Select a file");
+    map.set(RStr.AvoirDropZone_defaultSubtitle_apkAab, "Supports APK or AAB files");
+    map.set(RStr.AvoirDropZone_defaultSubtitle_image, "Supports PNG, JPG or WEBP files");
+    map.set(RStr.AvoirDropZone_clickToBrowse, "or click to browse");
+    map.set(RStr.AvoirDropZone_clickOrDragToReplace, "Click or Drag to replace");
+
+    map.set(RStr.FileUploadingLoader_uploading, "Uploading file...");
+    map.set(RStr.FileUploadingLoader_processing, "Waiting for transaction...");
+    map.set(RStr.FileUploadingLoader_mayTakeTime, "Could take up to few minutes.");
 
     return map;
 }

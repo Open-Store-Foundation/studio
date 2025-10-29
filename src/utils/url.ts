@@ -25,3 +25,9 @@ export function decodePath(value: string) {
         return value;
     }
 }
+
+export function addSubdomain(url: string, subdomain: string): string {
+    const parsed = new URL(url);
+    parsed.hostname = `${subdomain}.${parsed.hostname}`;
+    return parsed.toString();
+}

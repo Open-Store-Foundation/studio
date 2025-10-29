@@ -344,7 +344,13 @@ export function CreateAppScreen() {
     useAsyncEffect(async () => {
         const hasPermission = await greenfield.hasPolicy(devId, address)
         if (!hasPermission) {
-            const policyData = await greenfield.createBucketPolicyData(devId, address)
+            try {
+                const policyData = await greenfield.createBucketPolicyData(devId, address)
+                setPolicyData(policyData || null)
+            } catch (e) {
+                console.error(e)
+            }
+        } else {
             setPolicyData(policyData || null)
         }
     }, []);

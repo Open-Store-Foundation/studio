@@ -8,6 +8,10 @@ import {
     StorageQueryParamsResponse
 } from './GreenfieldFeeClient.ts';
 import {QueryDynamicBalanceResponse} from './gf_mirror.ts';
+import {GfBuildFile} from './models.ts';
+import {ListObjectsByBucketNameResponse} from '@bnb-chain/greenfield-js-sdk';
+import {parseStringPromise} from "xml2js";
+import {addSubdomain} from "@utils/url.ts";
 
 export interface GetMsgGasParamsRequest {
     msgTypeUrls: string[];
@@ -112,11 +116,78 @@ export class BucketClient {
 }
 
 export class ObjectClient {
+
+    private static INDEX_FOLDER_NAME = "open-store-external"
+
     constructor(private http: AxiosInstance) {}
 
     async listObjects(request: { bucketName: string; endpoint: string; query: URLSearchParams }): Promise<any> { // TODO
         const response = await this.http.get(`/greenfield/storage/list_objects/${request.bucketName}?${request.query.toString()}`);
         return response.data;
+    }
+
+    async getAppVersions(
+        sp: string,
+        bucket: string,
+        appPackage: string,
+        version?: string,
+        code?: number,
+        checksum?: string
+    ): Promise<GfBuildFile[]> {
+        const basePath = `${this.getAppFolder(appPackage)}/v`;
+        const primaryPrefix = `${basePath}/`;
+
+        let prefix = basePath;
+        if (version) {
+            prefix += `/${version}`;
+            if (code) {
+                prefix += `/${code}`;
+                if (checksum) {
+                    prefix += `/${checksum}`;
+                }
+            }
+        }
+
+        const query = `prefix=${prefix}`;
+        const url = `${addSubdomain(sp, bucket)}?${query}`;
+        const response = await this.http.get(url);
+
+        const parsed: ListObjectsByBucketNameResponse = await parseStringPromise(
+            response.data,
+            {explicitArray: false}
+        );
+
+        const meta = parsed?.GfSpListObjectsByBucketNameResponse?.Objects || [];
+        const objects = Array.isArray(meta) ? meta : [meta];
+
+        return objects
+            .filter(
+                (meta) =>
+                    meta.ObjectInfo.ContentType === "application/vnd.android.package-archive" &&
+                    meta.ObjectInfo.ObjectName.endsWith(".apk")
+            )
+            .map((meta) => {
+                const obj = meta.ObjectInfo;
+                const name = obj.ObjectName
+                    .replace(primaryPrefix, "")
+                    .replace(".apk", "");
+                const [versionName, versionCode, checksum] = name.split("/");
+
+                return <GfBuildFile>{
+                    id: obj.Id,
+                    versionName,
+                    versionCode: parseInt(versionCode),
+                    checksum,
+                    createdAt: obj.CreateAt,
+                    size: obj.PayloadSize,
+                    path: obj.ObjectName,
+                    type: "APK",
+                };
+            })
+    }
+
+    getAppFolder(appPackage: string) {
+        return `${ObjectClient.INDEX_FOLDER_NAME}/${appPackage.replaceAll(".", "_")}/android`
     }
 }
 

@@ -1,7 +1,6 @@
 import {Client, GRNToString, newBucketGRN} from "@bnb-chain/greenfield-js-sdk";
 import {GreenNetwork} from "./networks.ts";
 import {GfAuth, GfBuildFile} from "./models.ts";
-import {ApkInfo} from "@utils/apk.ts";
 import {GreenfieldFeeClient} from "@data/greenfield/GreenfieldFeeClient.ts";
 import {GasProvider} from "@data/sc/GasProvider.ts";
 import {TimedCache} from "@utils/cache.ts";
@@ -19,7 +18,8 @@ import {ActionType, Effect, Policy, PrincipalType} from "./generated/greenfield/
 import {ResourceType} from "./generated/greenfield/resource.ts";
 import {VisibilityType} from "./generated/greenfield/storage.ts";
 import {GreenfieldHttpClient} from "@data/greenfield/GreenfieldHttpClient.ts";
-import { toHex } from "viem";
+import {toHex} from "viem";
+import {ApkInfo} from "@utils/apk.ts";
 
 export interface DelegateCreateParams {
     path: string,
@@ -30,8 +30,6 @@ export interface DelegateCreateParams {
 }
 
 export class GreenfieldClient {
-
-    private static INDEX_FOLDER_NAME = "open-store-external"
 
     private client: Client
     private httpClient: GreenfieldHttpClient
@@ -73,6 +71,44 @@ export class GreenfieldClient {
 
     clearQuoteCache(bucket: string) {
         this.cache.delete(CacheKeys.GfQuote.key(bucket))
+    }
+
+    apkPath(appInfo: ApkInfo): string {
+        return `${this.httpClient.object.getAppFolder(appInfo.packageName)}/v/${appInfo.versionName}/${appInfo.versionCode}/${appInfo.checksum.toLowerCase()}.apk`
+    }
+
+    logoPath(appPackage: string): string {
+        return `${this.httpClient.object.getAppFolder(appPackage)}/logo.png`
+    }
+
+    async getAppVersion(bucket: string, appInfo: ApkInfo): Promise<GfBuildFile | null> {
+        const versions = await this.getAppVersions(
+            bucket, appInfo.packageName, appInfo.versionName, appInfo.versionCode,
+        )
+
+        if (versions.length > 1) {
+            console.log("More than one version found for app: ", appInfo.packageName, appInfo.versionName, appInfo.versionCode)
+            // TODO v2 stat
+        }
+
+        return versions.length > 0 ? versions[0] : null
+    }
+
+    async getAppVersions(
+        bucket: string,
+        appPackage: string,
+        version?: string,
+        code?: number,
+        checksum?: string
+    ): Promise<GfBuildFile[]> {
+        const sp = await this.findPrimarySpProvider(bucket);
+        if (!sp) {
+            throw new Error("No primary SP found");
+        }
+
+        return await this.httpClient.object.getAppVersions(
+            sp, bucket, appPackage, version, code, checksum
+        )
     }
 
     async bucketReadQuote(auth: GfAuth, bucket: string): Promise<IQuotaProps> {
@@ -315,14 +351,6 @@ export class GreenfieldClient {
         return isSuccess
     }
 
-    apkPath(appInfo: ApkInfo): string {
-        return `${this.getAppFolder(appInfo.packageName)}/android/v/${appInfo.versionName}/${appInfo.versionCode}/${appInfo.checksum.toLowerCase()}.apk`
-    }
-
-    logoPath(appPackage: string): string {
-        return `${this.getAppFolder(appPackage)}/logo.png`
-    }
-
     async hasFile(bucket: string, path: string): Promise<boolean> {
         try {
             const data = await this.client.object.headObject(bucket.toLowerCase(), path)
@@ -343,83 +371,6 @@ export class GreenfieldClient {
                 return url
             }
         )
-    }
-
-    private getAppFolder(appPackage: string) {
-        return `${GreenfieldClient.INDEX_FOLDER_NAME}/${appPackage.replaceAll(".", "_")}/android`
-    }
-
-    async getAppVersion(bucket: string, appInfo: ApkInfo): Promise<GfBuildFile | null> {
-        const versions = await this.getAppVersions(
-            bucket, appInfo.packageName, appInfo.versionName, appInfo.versionCode,
-        )
-
-        if (versions.length > 1) {
-            console.log("More than one version found for app: ", appInfo.packageName, appInfo.versionName, appInfo.versionCode)
-            // TODO v2 stat
-        }
-
-        return versions.length > 0 ? versions[0] : null
-    }
-
-    async getAppVersions(bucket: string, appPackage: string, version?: string, code?: number, checksum?: String): Promise<GfBuildFile[]> {
-        const basePath = `${this.getAppFolder(appPackage)}/v`
-        const primaryPrefix = `${basePath}/`
-
-        let prefix = basePath
-        if (version) {
-            prefix += `/${version}`
-
-            if (code) {
-                prefix += `/${code}`
-
-                if (checksum) {
-                    prefix += `/${checksum}`
-                }
-            }
-        }
-
-        const sp = await this.findPrimarySpProvider(bucket)
-        if (!sp) {
-            throw new Error("No primary SP found")
-        }
-
-        const objects = await this.client.object.listObjects(
-            {
-                bucketName: bucket.toLowerCase(),
-                endpoint: sp,
-                query: new URLSearchParams([
-                    [`prefix`, prefix],
-                ])
-            }
-        )
-
-        return objects.body
-                ?.GfSpListObjectsByBucketNameResponse
-                ?.Objects
-                ?.filter((obj: any) => {
-                    return obj.ObjectInfo.ContentType == "application/vnd.android.package-archive"
-                        && obj.ObjectInfo.ObjectName.endsWith(".apk")
-                })
-                ?.map((obj: any) => {
-                    const name = obj.ObjectInfo.ObjectName
-                        .replace(primaryPrefix, "")
-                        .replace(".apk", "")
-
-                    const [versionName, versionCode, checksum] = name.split("/")
-
-                    return <GfBuildFile>{
-                        id: obj.ObjectInfo.Id,
-                        versionName: versionName,
-                        versionCode: parseInt(versionCode),
-                        checksum: checksum,
-                        createdAt: obj.ObjectInfo.CreateAt,
-                        size: obj.ObjectInfo.PayloadSize,
-                        path: obj.ObjectInfo.ObjectName,
-                        type: "APK"
-                    }
-                })
-            || []
     }
 
     private eddsaAuth(auth: GfAuth): AuthType {

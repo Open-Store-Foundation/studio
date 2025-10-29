@@ -16,6 +16,7 @@ import {str} from "@localization/res.ts";
 import {FileValidator} from "@utils/validators.ts";
 import {Task, TaskEvent, TaskState, TaskStateCheck, TaskStatus} from "@data/scheduler/TaskClient.ts";
 import {AvoirDialog} from "@components/basic/AvoirDialog.tsx";
+import {FileUploadingLoader} from "@components/inputs/FileUploadingLoader.tsx";
 
 
 export interface BaseFileUploaderProps {
@@ -144,10 +145,12 @@ export function BaseFileUploaderDrawer(
     };
 
     const isTaskLoading = TaskStateCheck.isLoading(taskState)
+    const inProgress = true //isTaskLoading || isLoading
     const canUpload = selectedFile != null
         && isReady !== false
         && AmountSummaryHelper.isReady(feeState)
         && !isTaskLoading
+        && !isLoading
 
     return (
         <PageContainer>
@@ -181,46 +184,53 @@ export function BaseFileUploaderDrawer(
                     height={"100%"}
                     spacing={4}
                 >
-                    <AvoirDropZone
-                        onFileSelect={handleFileSelect}
-                        selectedFile={selectedFile}
-                        accept={validator.getAcceptedTypes()}
-                        isLoading={isTaskLoading}
-                        isProcessing={isLoading}
-                        progress={uploadProgress}
-                        title={validator.getDropZoneTitle()}
-                        subtitle={validator.getDropZoneSubtitle()}
-                    />
+                    {inProgress ? (
+                        <Stack width={"100%"} height={"100%"} alignItems={"center"} justifyContent={"center"}>
+                            <FileUploadingLoader isLoading={isTaskLoading} isProcessing={isLoading} progress={30} />
+                        </Stack>
+                    ) : (
+                        <>
+                            <AvoirDropZone
+                                onFileSelect={handleFileSelect}
+                                selectedFile={selectedFile}
+                                accept={validator.getAcceptedTypes()}
+                                isLoading={inProgress}
+                                progress={uploadProgress}
+                                title={validator.getDropZoneTitle()}
+                                subtitle={validator.getDropZoneSubtitle()}
+                            />
 
-                    <Stack spacing={2}>
-                        <ConfirmAccountForm
-                            owner={address}
-                            devName={devId}
-                            appPackage={appPackage}
-                        />
+                            <Stack spacing={2}>
+                                <ConfirmAccountForm
+                                    owner={address}
+                                    devName={devId}
+                                    appPackage={appPackage}
+                                />
 
-                        {additionForm}
+                                {additionForm}
 
-                        <AmountsSummaryForm
-                            devAddress={devAddress}
-                            devId={devId}
-                            onState={setFeeState}
-                            onError={setError}
-                            storageMessages={selectedFile ? [GfMsgType.CREATE_OBJECT] : undefined}
-                            fileSize={selectedFile?.size}
-                            isReady={isReady}
+                                <AmountsSummaryForm
+                                    devAddress={devAddress}
+                                    devId={devId}
+                                    onState={setFeeState}
+                                    onError={setError}
+                                    storageMessages={selectedFile ? [GfMsgType.CREATE_OBJECT] : undefined}
+                                    fileSize={selectedFile?.size}
+                                    isReady={isReady}
 
-                            quoteRequirement={undefined}
-                            estimation={undefined}
-                            onIncreaseQuota={undefined}
-                            retryKey={undefined}
-                            relayCalls={undefined}
-                            topUpStorageAmount={undefined}
-                            newQuoteGb={undefined}
-                            withValidation={undefined}
-                            withOracle={undefined}
-                        />
-                    </Stack>
+                                    quoteRequirement={undefined}
+                                    estimation={undefined}
+                                    onIncreaseQuota={undefined}
+                                    retryKey={undefined}
+                                    relayCalls={undefined}
+                                    topUpStorageAmount={undefined}
+                                    newQuoteGb={undefined}
+                                    withValidation={undefined}
+                                    withOracle={undefined}
+                                />
+                            </Stack>
+                        </>
+                    )}
 
                     <Box flexGrow={1}/>
 
@@ -245,4 +255,4 @@ export function BaseFileUploaderDrawer(
             </ContentContainer>
         </PageContainer>
     )
-} 
+}

@@ -500,4 +500,15 @@ export class RStr {
     static PngLogoValidator_error_invalidImage: StrToken = "PngLogoValidator.error.invalidImage";
     static PngLogoValidator_dropZone_title: StrToken = "PngLogoValidator.dropZone.title";
     static PngLogoValidator_dropZone_subtitle: StrToken = "PngLogoValidator.dropZone.subtitle";
+
+    static AvoirDropZone_defaultTitle: StrToken = "AvoirDropZone.defaultTitle";
+    static AvoirDropZone_defaultSubtitle_default: StrToken = "AvoirDropZone.defaultSubtitle.default";
+    static AvoirDropZone_defaultSubtitle_apkAab: StrToken = "AvoirDropZone.defaultSubtitle.apkAab";
+    static AvoirDropZone_defaultSubtitle_image: StrToken = "AvoirDropZone.defaultSubtitle.image";
+    static AvoirDropZone_clickToBrowse: StrToken = "AvoirDropZone.clickToBrowse";
+    static AvoirDropZone_clickOrDragToReplace: StrToken = "AvoirDropZone.clickOrDragToReplace";
+
+    static FileUploadingLoader_uploading: StrToken = "FileUploadingLoader.uploading";
+    static FileUploadingLoader_processing: StrToken = "FileUploadingLoader.processing";
+    static FileUploadingLoader_mayTakeTime: StrToken = "FileUploadingLoader.mayTakeTime";
 }
